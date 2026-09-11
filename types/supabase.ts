@@ -17,6 +17,18 @@ export type ResumeSectionType =
   | "project_header"
   | "project_bullet";
 export type ResumeVersionStatus = "draft" | "finalized";
+export type ApplicationStatus =
+  | "discovered"
+  | "qualified"
+  | "resume_generated"
+  | "ready"
+  | "applied"
+  | "recruiter_screen"
+  | "interview"
+  | "final"
+  | "offer"
+  | "rejected"
+  | "ghosted";
 
 export type Database = {
   public: {
@@ -494,6 +506,192 @@ export type Database = {
           matched_skill_id?: string | null;
           user_verified?: boolean;
           verified_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      applications: {
+        Row: {
+          id: string;
+          user_id: string;
+          job_id: string;
+          resume_version_id: string | null;
+          status: ApplicationStatus;
+          status_updated_at: string;
+          match_score_at_creation: number | null;
+          salary_notes: string | null;
+          cover_letter_text: string | null;
+          why_tags: string[];
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          job_id: string;
+          resume_version_id?: string | null;
+          status?: ApplicationStatus;
+          status_updated_at?: string;
+          match_score_at_creation?: number | null;
+          salary_notes?: string | null;
+          cover_letter_text?: string | null;
+          why_tags?: string[];
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          job_id?: string;
+          resume_version_id?: string | null;
+          status?: ApplicationStatus;
+          status_updated_at?: string;
+          match_score_at_creation?: number | null;
+          salary_notes?: string | null;
+          cover_letter_text?: string | null;
+          why_tags?: string[];
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      application_status_history: {
+        Row: {
+          id: string;
+          user_id: string;
+          application_id: string;
+          status: ApplicationStatus;
+          note: string | null;
+          changed_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          application_id: string;
+          status: ApplicationStatus;
+          note?: string | null;
+          changed_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          application_id?: string;
+          status?: ApplicationStatus;
+          note?: string | null;
+          changed_at?: string;
+        };
+        Relationships: [];
+      };
+      contacts: {
+        Row: {
+          id: string;
+          user_id: string;
+          application_id: string | null;
+          name: string;
+          role: string | null;
+          email: string | null;
+          phone: string | null;
+          linkedin_url: string | null;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          application_id?: string | null;
+          name: string;
+          role?: string | null;
+          email?: string | null;
+          phone?: string | null;
+          linkedin_url?: string | null;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          application_id?: string | null;
+          name?: string;
+          role?: string | null;
+          email?: string | null;
+          phone?: string | null;
+          linkedin_url?: string | null;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      interviews: {
+        Row: {
+          id: string;
+          user_id: string;
+          application_id: string;
+          contact_id: string | null;
+          interview_type: string | null;
+          scheduled_at: string | null;
+          notes: string | null;
+          outcome: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          application_id: string;
+          contact_id?: string | null;
+          interview_type?: string | null;
+          scheduled_at?: string | null;
+          notes?: string | null;
+          outcome?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          application_id?: string;
+          contact_id?: string | null;
+          interview_type?: string | null;
+          scheduled_at?: string | null;
+          notes?: string | null;
+          outcome?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      follow_ups: {
+        Row: {
+          id: string;
+          user_id: string;
+          application_id: string;
+          note: string;
+          due_date: string | null;
+          completed: boolean;
+          completed_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          application_id: string;
+          note: string;
+          due_date?: string | null;
+          completed?: boolean;
+          completed_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          application_id?: string;
+          note?: string;
+          due_date?: string | null;
+          completed?: boolean;
+          completed_at?: string | null;
           created_at?: string;
         };
         Relationships: [];

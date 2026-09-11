@@ -9,9 +9,11 @@ import { Badge } from "@/components/ui/badge";
 import { JobForm } from "@/components/jobs/job-form";
 import { MatchCard } from "@/components/jobs/match-card";
 import { ResumeCard } from "@/components/jobs/resume-card";
+import { ApplicationCard } from "@/components/jobs/application-card";
 import { createClient } from "@/lib/supabase/server";
 import { updateJob, deleteJob, analyzeMatch } from "../actions";
 import { generateResume } from "@/app/(dashboard)/resume/actions";
+import { createApplication } from "@/app/(dashboard)/applications/actions";
 
 function RequirementList({
   label,
@@ -49,6 +51,7 @@ export default async function JobDetailPage({
     { data: accomplishments },
     { data: evidence },
     { data: resumeVersions },
+    { data: application },
   ] = await Promise.all([
     supabase.from("jobs").select("*").eq("id", id).single(),
     supabase
@@ -66,6 +69,7 @@ export default async function JobDetailPage({
       .select("*")
       .eq("job_id", id)
       .order("version_number", { ascending: false }),
+    supabase.from("applications").select("*").eq("job_id", id).maybeSingle(),
   ]);
 
   if (!job) notFound();
@@ -106,6 +110,11 @@ export default async function JobDetailPage({
         versions={resumeVersions ?? []}
         score={score ?? null}
         action={generateResume.bind(null, id)}
+      />
+
+      <ApplicationCard
+        application={application ?? null}
+        action={createApplication.bind(null, id)}
       />
 
       {requirements && (

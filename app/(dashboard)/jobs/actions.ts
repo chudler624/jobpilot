@@ -336,12 +336,16 @@ export async function analyzeMatch(
   return {};
 }
 
-export async function deleteJob(id: string) {
+export async function deleteJob(
+  id: string,
+  _prevState: ActionState,
+  _formData: FormData
+): Promise<ActionState> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return;
+  if (!user) return { error: "Not signed in" };
 
   const { error } = await supabase
     .from("jobs")
@@ -349,7 +353,15 @@ export async function deleteJob(id: string) {
     .eq("id", id)
     .eq("user_id", user.id);
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    if (error.code === "23503") {
+      return {
+        error:
+          "Can't delete this job — it has an application tracked against it. Delete the application first.",
+      };
+    }
+    return { error: error.message };
+  }
 
   revalidatePath("/jobs");
   redirect("/jobs");

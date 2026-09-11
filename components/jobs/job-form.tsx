@@ -30,9 +30,10 @@ export function JobForm({
 }: {
   job: Job;
   action: (prevState: ActionState, formData: FormData) => Promise<ActionState>;
-  deleteAction: () => Promise<void>;
+  deleteAction: (prevState: ActionState, formData: FormData) => Promise<ActionState>;
 }) {
   const [state, formAction] = useActionState(action, {});
+  const [deleteState, deleteFormAction] = useActionState(deleteAction, {});
 
   return (
     <div className="space-y-6">
@@ -113,10 +114,13 @@ export function JobForm({
           Save changes
         </Button>
       </form>
-      <form action={deleteAction}>
+      <form action={deleteFormAction} className="space-y-2">
         <ConfirmSubmitButton confirmMessage="Delete this job? This can't be undone.">
           Delete job
         </ConfirmSubmitButton>
+        {deleteState?.error && (
+          <p className="text-sm text-destructive">{deleteState.error}</p>
+        )}
       </form>
     </div>
   );

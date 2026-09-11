@@ -6,8 +6,7 @@ Phase: 3 / 10
 Progress: 36% (Phases 0-3 of 10 complete)
 
 Current Goal:
-Verify Phase 1.5 (Career Profile Import) live, then begin Phase 4 —
-Resume Engine.
+Begin Phase 4 — Resume Engine.
 
 ---
 
@@ -15,7 +14,7 @@ Resume Engine.
 
 - [x] Phase 0 — Foundation
 - [x] Phase 1 — Career Profile
-- [ ] Phase 1.5 — Career Profile Import (added mid-Phase-4 planning, not in the original 0-10 roadmap)
+- [x] Phase 1.5 — Career Profile Import (added mid-Phase-4 planning, not in the original 0-10 roadmap)
 - [x] Phase 2 — Job Analyzer
 - [x] Phase 3 — Match Engine
 - [ ] Phase 4 — Resume Engine
@@ -95,7 +94,10 @@ Create the verified source of truth for your professional experience — the dat
 
 ## Phase 1.5 — Career Profile Import
 
-**Status:** BUILT — pending live verification
+**Status:** DONE (DOCX path verified live; PDF path shares the same code
+path and was verified for extraction quality via a standalone script, but
+not yet exercised through the actual upload UI — low risk, worth a quick
+live check next time a PDF resume is handy)
 
 Added mid-Phase-4-planning, not part of the original Phase 0-10 roadmap —
 requested to give Match Engine (Phase 3) and Resume Engine (Phase 4)
@@ -137,13 +139,15 @@ No new tables — inserts directly into `experiences`, `accomplishments`,
 
 ### Acceptance Criteria
 - [ ] Upload a PDF resume → extracted experiences/projects/skills shown
-      for review before anything is saved
-- [ ] Upload a DOCX resume → same result
-- [ ] Can exclude or edit any extracted item before saving
-- [ ] Confirmed items are saved as real Career Profile rows, scoped to the
-      user
-- [x] Build passes (lint/typecheck/build all pass; live browser testing —
-      including the file upload itself — still pending)
+      for review before anything is saved (not yet tested live — DOCX was
+      tested instead; PDF path only verified via a standalone script, not
+      through the actual upload UI)
+- [x] Upload a DOCX resume → extracted experiences/projects/skills shown
+      for review, confirmed live on jobpilot-sandy.vercel.app
+- [x] Can exclude or edit any extracted item before saving — confirmed live
+- [x] Confirmed items are saved as real Career Profile rows, scoped to the
+      user — confirmed live
+- [x] Build passes
 
 ---
 

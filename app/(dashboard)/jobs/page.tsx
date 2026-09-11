@@ -34,9 +34,14 @@ export default async function JobsPage() {
             Paste a job description to extract structured fields.
           </p>
         </div>
-        <Link href="/jobs/new" className={buttonVariants()}>
-          Analyze a job
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href="/jobs/discover" className={buttonVariants({ variant: "outline" })}>
+            Discover jobs
+          </Link>
+          <Link href="/jobs/new" className={buttonVariants()}>
+            Analyze a job
+          </Link>
+        </div>
       </div>
 
       {!jobs?.length && (

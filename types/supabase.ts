@@ -6,6 +6,8 @@
 export type EvidenceStrength = "direct" | "adjacent" | "limited" | "none";
 export type SubscriptionStatus = "free" | "pro";
 export type WorkplaceType = "remote" | "hybrid" | "onsite";
+export type JobSource = "greenhouse";
+export type AtsProvider = "greenhouse";
 export type Recommendation = "apply" | "apply_stretch" | "maybe" | "skip";
 export type RequirementType = "required" | "preferred" | "technology" | "domain";
 export type MatchStatus = "strong" | "partial" | "missing";
@@ -245,6 +247,7 @@ export type Database = {
           id: string;
           user_id: string;
           source_url: string | null;
+          source: JobSource | null;
           raw_description: string;
           company: string | null;
           title: string | null;
@@ -260,6 +263,7 @@ export type Database = {
           id?: string;
           user_id: string;
           source_url?: string | null;
+          source?: JobSource | null;
           raw_description: string;
           company?: string | null;
           title?: string | null;
@@ -275,6 +279,7 @@ export type Database = {
           id?: string;
           user_id?: string;
           source_url?: string | null;
+          source?: JobSource | null;
           raw_description?: string;
           company?: string | null;
           title?: string | null;
@@ -285,6 +290,33 @@ export type Database = {
           salary_currency?: string | null;
           created_at?: string;
           updated_at?: string;
+        };
+        Relationships: [];
+      };
+      watched_companies: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          ats: AtsProvider;
+          board_token: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          ats?: AtsProvider;
+          board_token: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string;
+          ats?: AtsProvider;
+          board_token?: string;
+          created_at?: string;
         };
         Relationships: [];
       };

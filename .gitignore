@@ -40,6 +40,10 @@ yarn-error.log*
 # supabase cli
 supabase/.temp
 
+# browser extension (separate package, see extension/package.json)
+extension/node_modules
+extension/dist
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

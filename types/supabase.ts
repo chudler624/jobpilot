@@ -40,21 +40,30 @@ export type Database = {
           id: string;
           email: string;
           display_name: string | null;
+          phone: string | null;
           subscription_status: SubscriptionStatus;
+          work_authorization_status: string | null;
+          requires_sponsorship: boolean | null;
           created_at: string;
         };
         Insert: {
           id: string;
           email: string;
           display_name?: string | null;
+          phone?: string | null;
           subscription_status?: SubscriptionStatus;
+          work_authorization_status?: string | null;
+          requires_sponsorship?: boolean | null;
           created_at?: string;
         };
         Update: {
           id?: string;
           email?: string;
           display_name?: string | null;
+          phone?: string | null;
           subscription_status?: SubscriptionStatus;
+          work_authorization_status?: string | null;
+          requires_sponsorship?: boolean | null;
           created_at?: string;
         };
         Relationships: [];

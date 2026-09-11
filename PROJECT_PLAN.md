@@ -2,11 +2,11 @@
 
 ## Current Status
 
-Phase: 3 / 10
-Progress: 36% (Phases 0-3 of 10 complete)
+Phase: 4 / 10
+Progress: 45% (Phases 0-4 of 10 complete)
 
 Current Goal:
-Begin Phase 4 — Resume Engine.
+Begin Phase 5 — Truth Guard.
 
 ---
 
@@ -17,7 +17,7 @@ Begin Phase 4 — Resume Engine.
 - [x] Phase 1.5 — Career Profile Import (added mid-Phase-4 planning, not in the original 0-10 roadmap)
 - [x] Phase 2 — Job Analyzer
 - [x] Phase 3 — Match Engine
-- [ ] Phase 4 — Resume Engine
+- [x] Phase 4 — Resume Engine
 - [ ] Phase 5 — Truth Guard
 - [ ] Phase 6 — Application Tracker
 - [ ] Phase 7 — Job Discovery
@@ -208,7 +208,7 @@ Score a job against the Career Profile and give a clear apply/skip recommendatio
 
 ## Phase 4 — Resume Engine
 
-**Status:** NOT STARTED
+**Status:** DONE
 
 ### Objective
 Generate a tailored, truthful resume from the Career Profile + a specific job.
@@ -217,19 +217,33 @@ Generate a tailored, truthful resume from the Career Profile + a specific job.
 - Code-driven resume template (AI fills content, app controls formatting — ATS-safe: single-column, no graphics/tables/text boxes)
 - Tailoring changes: summary, skill ordering/selection, bullet ordering/wording, project selection, technical emphasis
 - Never invents experience
-- Resume Library: Master Resume → role-specific versions → per-company versions, each versioned (v1, v2, v3...)
+- Resume Library: Master Resume → per-job tailored versions, each versioned
+  (v1, v2, v3...) — simplified from the original 3-tier "role-specific"
+  taxonomy; `based_on_version_id` still allows any version to be used as a
+  starting point for another
 - Original vs. tailored comparison view
+- No `resume_templates` table — one hardcoded ATS-safe template in
+  `lib/resume/template.ts` (flagged deviation, approved during planning)
+- Match-quality warning: if a job's required-skills match is below Match
+  Engine's own "skip" threshold, both the job's Resume card and the
+  generated version's page show a warning (not a block — generation still
+  proceeds) — added after live testing showed a weak-match tailored resume
 
 ### Database
-- `resume_templates`
 - `resume_versions`
 - `resume_sections`
 
 ### Acceptance Criteria
-- [ ] One click produces a tailored DOCX from a job + career profile
-- [ ] Every resume version is saved and tied to the job it was generated for
-- [ ] Comparison view shows what changed vs. the master resume
-- [ ] Build passes
+- [x] One click produces a tailored DOCX from a job + career profile —
+      confirmed live; DOCX opens correctly with proper single-column
+      formatting, grouped bullets, and comma-separated skills
+- [x] Every resume version is saved and tied to the job it was generated
+      for (`job_id`, `NULL` for the Master Resume)
+- [x] Comparison view shows what changed vs. the master resume —
+      confirmed live (Added/Removed/Reworded, matched by cited Career
+      Profile row so a reworded bullet reads as reworded, not
+      add+remove)
+- [x] Build passes
 
 ---
 

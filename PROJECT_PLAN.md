@@ -2,11 +2,11 @@
 
 ## Current Status
 
-Phase: 6 / 10
-Progress: 60% (Phases 0-6 of 10 complete)
+Phase: 7 / 10
+Progress: 70% (Phases 0-7 of 10 complete)
 
 Current Goal:
-Live-test Phase 7 — Job Discovery on jobpilot-sandy.vercel.app.
+Begin Phase 8 — Application Assistant.
 
 ---
 
@@ -20,7 +20,7 @@ Live-test Phase 7 — Job Discovery on jobpilot-sandy.vercel.app.
 - [x] Phase 4 — Resume Engine
 - [x] Phase 5 — Truth Guard
 - [x] Phase 6 — Application Tracker
-- [ ] Phase 7 — Job Discovery
+- [x] Phase 7 — Job Discovery
 - [ ] Phase 8 — Application Assistant
 - [ ] Phase 9 — Analytics
 - [ ] Phase 10 — Monetization
@@ -342,7 +342,12 @@ Personal CRM for the job search.
 
 ## Phase 7 — Job Discovery
 
-**Status:** BUILT — awaiting live verification
+**Status:** DONE (not live-tested — user chose to skip verification and move
+on. User feedback, verbatim: "I think this feature is dumb and will be
+replaced." The Greenhouse-only, manually-watched-companies approach is
+considered weak/low-value as a discovery mechanism, not defective — treat
+this as a likely future revisit rather than a phase to build further on
+unprompted. See DECISIONS.md ADR-014 for what was built and why.)
 
 ### Objective
 Pull in jobs automatically instead of pasting one at a time.
@@ -370,11 +375,12 @@ Pull in jobs automatically instead of pasting one at a time.
 - `jobs.source` (nullable — `'greenhouse'` or null for manual paste/URL)
 
 ### Acceptance Criteria
-- [ ] A search produces a ranked list of scored jobs — implemented via
+- [x] A search produces a ranked list of scored jobs — implemented via
       watched-company fetch + pre/post-extraction filters + per-job
-      "Extract & score"; not yet live-tested
-- [ ] Duplicate jobs are not re-imported — enforced by a partial unique
-      index on `(user_id, source_url)`; not yet live-tested
+      "Extract & score"; not live-tested (user skipped verification)
+- [x] Duplicate jobs are not re-imported — enforced by a partial unique
+      index on `(user_id, source_url)`; not live-tested (user skipped
+      verification)
 - [x] Build passes — typecheck, lint, and `next build` all clean
 
 ---

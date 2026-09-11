@@ -2,11 +2,11 @@
 
 ## Current Status
 
-Phase: 4 / 10
-Progress: 45% (Phases 0-4 of 10 complete)
+Phase: 5 / 10
+Progress: 50% (Phases 0-5 of 10 complete)
 
 Current Goal:
-Live-test Phase 5 — Truth Guard on jobpilot-sandy.vercel.app.
+Begin Phase 6 — Application Tracker.
 
 ---
 
@@ -18,7 +18,7 @@ Live-test Phase 5 — Truth Guard on jobpilot-sandy.vercel.app.
 - [x] Phase 2 — Job Analyzer
 - [x] Phase 3 — Match Engine
 - [x] Phase 4 — Resume Engine
-- [ ] Phase 5 — Truth Guard
+- [x] Phase 5 — Truth Guard
 - [ ] Phase 6 — Application Tracker
 - [ ] Phase 7 — Job Discovery
 - [ ] Phase 8 — Application Assistant
@@ -249,21 +249,37 @@ Generate a tailored, truthful resume from the Career Profile + a specific job.
 
 ## Phase 5 — Truth Guard
 
-**Status:** BUILT — awaiting live verification
+**Status:** DONE (not live-tested on jobpilot-sandy.vercel.app — user chose to
+skip live verification and move on to Phase 6; correctness is backed by
+typecheck/lint/build passing, the migration confirmed applied via a direct
+`information_schema.columns` query, and the DB-level guarantee that a
+fabricated citation cannot be persisted, carried over unchanged from Phase 4)
 
 ### Objective
 Mandatory verification layer: every generated resume claim must trace to real evidence.
 
 ### Features
-- Each generated bullet stores `{claim, source, confidence, user_verified}`
-- "Why did I say this?" — reveals the underlying evidence for any bullet
-- Claims with no evidence are rejected before the resume is finalized
-- Distinguish "you have this skill but it's not represented on your resume" from "you don't have this skill"
+- Each `resume_sections` row carries `user_verified`/`verified_at`; confidence
+  ("well-evidenced" vs. "thin") is computed live from the cited row's real
+  evidence strength rather than stored, via a helper shared with Match
+  Engine's own scoring (`isCitationWellEvidenced`)
+- "Why did I say this?" — new `/resume/[versionId]/review` page reveals the
+  full underlying evidence (citation label + Problem/Action/Result or
+  equivalent) for any claim
+- `resume_versions.status` (`draft`/`finalized`); the `finalizeResumeVersion`
+  action refuses the transition unless every claim in the version is
+  `user_verified`, reporting exactly how many remain
+- The review page also lists Career Profile skills not cited anywhere in
+  that resume version, distinguishing "you have this skill, it's just not on
+  this resume" from "you don't have this skill"
 
 ### Acceptance Criteria
-- [ ] No resume can be finalized with an unverified claim
-- [ ] Every bullet is traceable to a specific evidence row
-- [ ] Build passes
+- [x] No resume can be finalized with an unverified claim — enforced in
+      `finalizeResumeVersion`; not live-tested, verified by code review only
+- [x] Every bullet is traceable to a specific evidence row — this was
+      already unconditionally true since Phase 4 (DB foreign keys +
+      `findFabricatedResumeCitation`); Phase 5 surfaces it in the UI
+- [x] Build passes — typecheck, lint, and `next build` all clean
 
 ---
 

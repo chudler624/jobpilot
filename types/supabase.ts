@@ -6,6 +6,9 @@
 export type EvidenceStrength = "direct" | "adjacent" | "limited" | "none";
 export type SubscriptionStatus = "free" | "pro";
 export type WorkplaceType = "remote" | "hybrid" | "onsite";
+export type Recommendation = "apply" | "apply_stretch" | "maybe" | "skip";
+export type RequirementType = "required" | "preferred" | "technology" | "domain";
+export type MatchStatus = "strong" | "partial" | "missing";
 
 export type Database = {
   public: {
@@ -307,6 +310,96 @@ export type Database = {
           keywords?: string[];
           created_at?: string;
           updated_at?: string;
+        };
+        Relationships: [];
+      };
+      job_scores: {
+        Row: {
+          id: string;
+          user_id: string;
+          job_id: string;
+          required_skills_score: number;
+          preferred_skills_score: number;
+          relevant_experience_score: number;
+          seniority_score: number | null;
+          industry_domain_score: number;
+          resume_representation_score: number | null;
+          overall_score: number;
+          recommendation: Recommendation;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          job_id: string;
+          required_skills_score: number;
+          preferred_skills_score: number;
+          relevant_experience_score: number;
+          seniority_score?: number | null;
+          industry_domain_score: number;
+          resume_representation_score?: number | null;
+          overall_score: number;
+          recommendation: Recommendation;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          job_id?: string;
+          required_skills_score?: number;
+          preferred_skills_score?: number;
+          relevant_experience_score?: number;
+          seniority_score?: number | null;
+          industry_domain_score?: number;
+          resume_representation_score?: number | null;
+          overall_score?: number;
+          recommendation?: Recommendation;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      job_score_matches: {
+        Row: {
+          id: string;
+          user_id: string;
+          job_score_id: string;
+          requirement_text: string;
+          requirement_type: RequirementType;
+          status: MatchStatus;
+          matched_skill_id: string | null;
+          matched_experience_id: string | null;
+          matched_accomplishment_id: string | null;
+          matched_evidence_id: string | null;
+          rationale: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          job_score_id: string;
+          requirement_text: string;
+          requirement_type: RequirementType;
+          status: MatchStatus;
+          matched_skill_id?: string | null;
+          matched_experience_id?: string | null;
+          matched_accomplishment_id?: string | null;
+          matched_evidence_id?: string | null;
+          rationale: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          job_score_id?: string;
+          requirement_text?: string;
+          requirement_type?: RequirementType;
+          status?: MatchStatus;
+          matched_skill_id?: string | null;
+          matched_experience_id?: string | null;
+          matched_accomplishment_id?: string | null;
+          matched_evidence_id?: string | null;
+          rationale?: string;
+          created_at?: string;
         };
         Relationships: [];
       };

@@ -7,8 +7,9 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { JobForm } from "@/components/jobs/job-form";
+import { MatchCard } from "@/components/jobs/match-card";
 import { createClient } from "@/lib/supabase/server";
-import { updateJob, deleteJob } from "../actions";
+import { updateJob, deleteJob, analyzeMatch } from "../actions";
 
 function RequirementList({
   label,
@@ -37,16 +38,46 @@ export default async function JobDetailPage({
 }) {
   const { id } = await params;
   const supabase = await createClient();
-  const [{ data: job }, { data: requirements }] = await Promise.all([
+  const [
+    { data: job },
+    { data: requirements },
+    { data: score },
+    { data: skills },
+    { data: experiences },
+    { data: accomplishments },
+    { data: evidence },
+  ] = await Promise.all([
     supabase.from("jobs").select("*").eq("id", id).single(),
     supabase
       .from("job_requirements")
       .select("*")
       .eq("job_id", id)
       .maybeSingle(),
+    supabase.from("job_scores").select("*").eq("job_id", id).maybeSingle(),
+    supabase.from("skills").select("id, name"),
+    supabase.from("experiences").select("id, company, title"),
+    supabase.from("accomplishments").select("id, description"),
+    supabase.from("evidence").select("id, title"),
   ]);
 
   if (!job) notFound();
+
+  const { data: matches } = score
+    ? await supabase
+        .from("job_score_matches")
+        .select("*")
+        .eq("job_score_id", score.id)
+        .order("requirement_type")
+    : { data: [] };
+
+  const citationLabels = new Map<string, string>();
+  for (const s of skills ?? []) citationLabels.set(s.id, `Skill: ${s.name}`);
+  for (const e of experiences ?? [])
+    citationLabels.set(e.id, `Experience: ${e.title} at ${e.company}`);
+  for (const a of accomplishments ?? [])
+    citationLabels.set(a.id, `Accomplishment: ${a.description.slice(0, 60)}`);
+  for (const ev of evidence ?? [])
+    citationLabels.set(ev.id, `Evidence: ${ev.title}`);
 
   return (
     <div className="max-w-2xl space-y-8">
@@ -54,6 +85,13 @@ export default async function JobDetailPage({
         job={job}
         action={updateJob.bind(null, id)}
         deleteAction={deleteJob.bind(null, id)}
+      />
+
+      <MatchCard
+        score={score ?? null}
+        matches={matches ?? []}
+        citationLabels={citationLabels}
+        action={analyzeMatch.bind(null, id)}
       />
 
       {requirements && (

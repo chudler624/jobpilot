@@ -6,7 +6,7 @@ Phase: 5 / 10
 Progress: 50% (Phases 0-5 of 10 complete)
 
 Current Goal:
-Begin Phase 6 — Application Tracker.
+Live-test Phase 6 — Application Tracker on jobpilot-sandy.vercel.app.
 
 ---
 
@@ -285,25 +285,61 @@ Mandatory verification layer: every generated resume claim must trace to real ev
 
 ## Phase 6 — Application Tracker
 
-**Status:** NOT STARTED
+**Status:** BUILT — awaiting live verification
 
 ### Objective
 Personal CRM for the job search.
 
 ### Features
-- Application record: company, position, salary, URL, date applied, resume version used, match score, cover letter version, answers, status
-- Pipeline: Discovered → Qualified → Resume Generated → Ready → Applied → Recruiter Screen → Interview → Final → Offer / Rejected / Ghosted
-- "Why I applied" tags (remote, comp, AI component, career progression, etc.)
-- Dashboard counts (new opportunities, strong matches, ready to apply, applied, interviews, etc.)
+- Application record: company/position/URL read through the linked job
+  (no duplication — stable, already captured by Job Analyzer); `salary_notes`
+  (free text — what was actually discussed, distinct from the posting's
+  salary_min/max); date applied derived from `application_status_history`
+  rather than stored; resume version used (nullable FK, `on delete set null`);
+  `match_score_at_creation` (one-time snapshot of `job_scores.overall_score`
+  — `job_scores` has no history, so this is the only way the recorded score
+  survives a later re-analysis); `cover_letter_text` (plain manual field, no
+  versioning — no generation feature exists); status
+- Pipeline: Discovered → Qualified → Resume Generated → Ready → Applied →
+  Recruiter Screen → Interview → Final → Offer / Rejected / Ghosted —
+  transitions aren't order-restricted (real searches skip/jump stages)
+- "Why I applied" tags — freeform `text[]`, same shape as `jobs.technologies`
+- Dashboard counts (new opportunities, strong matches, ready to apply,
+  applied, interviews) — live queries, not cached (see ADR discussion in
+  planning; personal-scale data doesn't warrant a materialized view)
+- `application_status_history` — one row per transition, the audit trail
+  a single status column can't provide; `applications.status` stays as a
+  denormalized "current" column written in the same action, for fast list
+  queries
+- No hard constraint requiring a `finalized` resume to attach to an
+  application (draft-resume warning shown instead, non-blocking) — see
+  ADR-013
+- `applications.job_id` is `on delete restrict` (an application is
+  irreplaceable history, unlike resume/match data which regenerates from
+  the job) — this made job deletion able to fail in a real way, so
+  `deleteJob` was converted from throw-on-error to the standard
+  `ActionState` pattern
 
 ### Database
 - `applications`
+- `application_status_history`
 - `contacts`
 - `interviews`
 - `follow_ups`
 
 ### Acceptance Criteria
-- [ ] Can create/update an application record end-to-end
+- [ ] Can create/update an application record end-to-end — "Track this
+      application" on the job detail page creates one; edit page updates
+      salary notes/cover letter/tags/resume version; implemented, not yet
+      live-tested
+- [ ] Status changes are tracked with timestamps — every transition writes
+      a row to `application_status_history` alongside updating the
+      denormalized `applications.status`/`status_updated_at`; implemented,
+      not yet live-tested
+- [ ] Dashboard reflects live counts — `getDashboardCounts()` wired into
+      `/dashboard`, replacing the Phase 0 placeholder; implemented, not yet
+      live-tested
+- [x] Build passes — typecheck, lint, and `next build` all clean
 - [ ] Status changes are tracked with timestamps
 - [ ] Dashboard reflects live counts
 - [ ] Build passes

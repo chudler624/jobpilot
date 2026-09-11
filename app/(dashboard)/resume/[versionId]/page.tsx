@@ -9,6 +9,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { createClient } from "@/lib/supabase/server";
 import { diffResumeSections } from "@/lib/resume/compare";
+import { SKIP_THRESHOLD } from "@/lib/match/recommend";
 import { deleteResumeVersion } from "../actions";
 import type { Database } from "@/types/supabase";
 
@@ -46,6 +47,7 @@ export default async function ResumeVersionPage({
     .order("order_index");
 
   let job: { title: string | null; company: string | null } | null = null;
+  let weakMatchScore: number | null = null;
   if (version.job_id) {
     const { data: jobRow } = await supabase
       .from("jobs")
@@ -53,6 +55,15 @@ export default async function ResumeVersionPage({
       .eq("id", version.job_id)
       .single();
     job = jobRow;
+
+    const { data: score } = await supabase
+      .from("job_scores")
+      .select("required_skills_score")
+      .eq("job_id", version.job_id)
+      .maybeSingle();
+    if (score && score.required_skills_score < SKIP_THRESHOLD) {
+      weakMatchScore = score.required_skills_score;
+    }
   }
 
   let diff: ReturnType<typeof diffResumeSections> | null = null;
@@ -93,6 +104,14 @@ export default async function ResumeVersionPage({
           Download DOCX
         </a>
       </div>
+
+      {weakMatchScore !== null && (
+        <p className="text-sm text-destructive">
+          This job&apos;s required-skills match is only{" "}
+          {Math.round(weakMatchScore * 100)}% — treat this resume&apos;s
+          relevance with that in mind.
+        </p>
+      )}
 
       <Card>
         <CardHeader>

@@ -52,20 +52,16 @@ export function ResumeCard({
         {weakMatch && (
           <p className="text-sm text-destructive">
             Required-skills match is only{" "}
-            {Math.round(score!.required_skills_score * 100)}% — generation
-            will be refused. Analyze match again after improving your
-            Career Profile, or reconsider this job.
+            {Math.round(score!.required_skills_score * 100)}% — a tailored
+            resume probably won&apos;t be strong for this job. You can still
+            generate one.
           </p>
         )}
         {state?.error && (
           <p className="text-sm text-destructive">{state.error}</p>
         )}
         <form action={formAction}>
-          <Button
-            type="submit"
-            variant="outline"
-            disabled={isPending || weakMatch}
-          >
+          <Button type="submit" variant="outline" disabled={isPending}>
             {isPending
               ? "Generating..."
               : versions.length > 0

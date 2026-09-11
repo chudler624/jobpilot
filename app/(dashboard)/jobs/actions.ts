@@ -202,7 +202,8 @@ export async function analyzeMatch(
         })),
       },
     });
-  } catch {
+  } catch (err) {
+    console.error("mapJobRequirements failed", err);
     return {
       error: "Couldn't analyze this match. Please try again in a moment.",
     };
@@ -210,6 +211,12 @@ export async function analyzeMatch(
 
   const validated = jobMatchMappingSchema.safeParse(mapping);
   if (!validated.success) {
+    console.error(
+      "jobMatchMappingSchema validation failed",
+      JSON.stringify(validated.error.issues, null, 2),
+      "raw mapping:",
+      JSON.stringify(mapping, null, 2)
+    );
     return {
       error: "The AI returned an unexpected format. Please try again.",
     };

@@ -2,11 +2,11 @@
 
 ## Current Status
 
-Phase: 5 / 10
-Progress: 50% (Phases 0-5 of 10 complete)
+Phase: 6 / 10
+Progress: 60% (Phases 0-6 of 10 complete)
 
 Current Goal:
-Live-test Phase 6 — Application Tracker on jobpilot-sandy.vercel.app.
+Begin Phase 7 — Job Discovery.
 
 ---
 
@@ -19,7 +19,7 @@ Live-test Phase 6 — Application Tracker on jobpilot-sandy.vercel.app.
 - [x] Phase 3 — Match Engine
 - [x] Phase 4 — Resume Engine
 - [x] Phase 5 — Truth Guard
-- [ ] Phase 6 — Application Tracker
+- [x] Phase 6 — Application Tracker
 - [ ] Phase 7 — Job Discovery
 - [ ] Phase 8 — Application Assistant
 - [ ] Phase 9 — Analytics
@@ -285,7 +285,7 @@ Mandatory verification layer: every generated resume claim must trace to real ev
 
 ## Phase 6 — Application Tracker
 
-**Status:** BUILT — awaiting live verification
+**Status:** DONE — confirmed live on jobpilot-sandy.vercel.app
 
 ### Objective
 Personal CRM for the job search.
@@ -328,17 +328,14 @@ Personal CRM for the job search.
 - `follow_ups`
 
 ### Acceptance Criteria
-- [ ] Can create/update an application record end-to-end — "Track this
-      application" on the job detail page creates one; edit page updates
-      salary notes/cover letter/tags/resume version; implemented, not yet
-      live-tested
-- [ ] Status changes are tracked with timestamps — every transition writes
-      a row to `application_status_history` alongside updating the
-      denormalized `applications.status`/`status_updated_at`; implemented,
-      not yet live-tested
-- [ ] Dashboard reflects live counts — `getDashboardCounts()` wired into
-      `/dashboard`, replacing the Phase 0 placeholder; implemented, not yet
-      live-tested
+- [x] Can create/update an application record end-to-end — confirmed live:
+      "Track this application" creates one from a job, edit page updates
+      salary notes/cover letter/tags/resume version
+- [x] Status changes are tracked with timestamps — confirmed live: every
+      transition writes a row to `application_status_history` alongside
+      the denormalized `applications.status`/`status_updated_at`
+- [x] Dashboard reflects live counts — confirmed live: `getDashboardCounts()`
+      wired into `/dashboard`, replacing the Phase 0 placeholder
 - [x] Build passes — typecheck, lint, and `next build` all clean
 - [ ] Status changes are tracked with timestamps
 - [ ] Dashboard reflects live counts

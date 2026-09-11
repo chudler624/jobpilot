@@ -2,20 +2,18 @@
 
 ## Current Status
 
-Phase: 0 / 10
-Progress: 9% (Phase 0 of 10 complete)
+Phase: 1 / 10
+Progress: 18% (Phases 0-1 of 10 complete)
 
 Current Goal:
-Retest live sign-in on Vercel once Supabase's default email rate limit
-resets (hit during Phase 0 verification), then begin Phase 1 — Career
-Profile.
+Begin Phase 2 — Job Analyzer.
 
 ---
 
 ## Roadmap
 
 - [x] Phase 0 — Foundation
-- [ ] Phase 1 — Career Profile
+- [x] Phase 1 — Career Profile
 - [ ] Phase 2 — Job Analyzer
 - [ ] Phase 3 — Match Engine
 - [ ] Phase 4 — Resume Engine
@@ -55,8 +53,8 @@ Get a bare-bones app deployed and connected to the database.
 
 ### Acceptance Criteria
 - [x] `https://<project>.vercel.app` loads (https://jobpilot-sandy.vercel.app)
-- [x] Can sign in via Supabase Auth (verified locally end-to-end; production
-      retest pending Supabase's default email rate limit resetting)
+- [x] Can sign in via Supabase Auth (verified locally and in production —
+      confirmed live during Phase 1 testing on jobpilot-sandy.vercel.app)
 - [x] Dashboard shell renders with nav (Dashboard, Jobs, Applications, Resume, Career Profile, Analytics, Settings)
 - [x] Supabase connection verified (a trivial read/write works)
 - [x] Lint, typecheck, and build all pass
@@ -65,7 +63,7 @@ Get a bare-bones app deployed and connected to the database.
 
 ## Phase 1 — Career Profile
 
-**Status:** NOT STARTED
+**Status:** DONE
 
 ### Objective
 Create the verified source of truth for your professional experience — the data everything else pulls from.
@@ -85,11 +83,11 @@ Create the verified source of truth for your professional experience — the dat
 - `evidence`
 
 ### Acceptance Criteria
-- [ ] Can create/edit/delete an experience
-- [ ] Can add skills with evidence-strength tagging
-- [ ] Can associate evidence with an accomplishment
-- [ ] Data persists in Supabase, scoped to the user
-- [ ] Build passes
+- [x] Can create/edit/delete an experience
+- [x] Can add skills with evidence-strength tagging
+- [x] Can associate evidence with an accomplishment
+- [x] Data persists in Supabase, scoped to the user
+- [x] Build passes
 
 ---
 

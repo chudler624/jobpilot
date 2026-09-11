@@ -123,22 +123,30 @@ export function MatchCard({
           </CardDescription>
         </div>
         {score && (
-          <Badge variant={RECOMMENDATION_VARIANT[score.recommendation]}>
-            {RECOMMENDATION_LABELS[score.recommendation]}
-          </Badge>
+          <div className="flex items-center gap-3">
+            <span className="text-2xl font-semibold">
+              {formatPercent(score.overall_score)}
+            </span>
+            <Badge variant={RECOMMENDATION_VARIANT[score.recommendation]}>
+              {RECOMMENDATION_LABELS[score.recommendation]}
+            </Badge>
+          </div>
         )}
       </CardHeader>
       <CardContent className="space-y-4">
         {score && (
-          <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-sm sm:grid-cols-3">
-            {DIMENSION_LABELS.map(({ key, label }) => (
-              <div key={key} className="flex justify-between gap-2">
-                <span className="text-muted-foreground">{label}</span>
-                <span className="font-medium">
-                  {formatPercent(score[key] as number | null)}
-                </span>
-              </div>
-            ))}
+          <div className="space-y-1.5">
+            <h4 className="text-sm font-medium">Breakdown</h4>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-sm sm:grid-cols-3">
+              {DIMENSION_LABELS.map(({ key, label }) => (
+                <div key={key} className="flex justify-between gap-2">
+                  <span className="text-muted-foreground">{label}</span>
+                  <span className="font-medium">
+                    {formatPercent(score[key] as number | null)}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

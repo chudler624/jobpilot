@@ -52,15 +52,23 @@ export function scoreRelevantExperience(
   const totalYears = [...experienceYears.values()].reduce((sum, y) => sum + y, 0);
   if (totalYears === 0) return 0;
 
-  const citedIds = new Set(
-    matches.map((m) => m.matchedExperienceId).filter((id): id is string => id !== null)
-  );
-  const citedYears = [...citedIds].reduce(
-    (sum, id) => sum + (experienceYears.get(id) ?? 0),
+  // Weight each cited experience's years by the strongest match that cited
+  // it (strong = full weight, partial = half) — a single partial citation
+  // of someone's only experience row should not count as 100% relevant.
+  const strengthByExperience = new Map<string, number>();
+  for (const m of matches) {
+    if (!m.matchedExperienceId) continue;
+    const weight = statusPoints(m.status);
+    const existing = strengthByExperience.get(m.matchedExperienceId) ?? 0;
+    if (weight > existing) strengthByExperience.set(m.matchedExperienceId, weight);
+  }
+
+  const weightedCitedYears = [...strengthByExperience.entries()].reduce(
+    (sum, [id, weight]) => sum + (experienceYears.get(id) ?? 0) * weight,
     0
   );
 
-  return Math.min(citedYears / totalYears, 1);
+  return Math.min(weightedCitedYears / totalYears, 1);
 }
 
 export function parseMinYears(experienceRequirement: string | null): number | null {

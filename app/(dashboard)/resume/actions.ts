@@ -323,6 +323,74 @@ export async function generateResume(
   redirect(`/resume/${version.id}`);
 }
 
+export async function setSectionVerified(
+  sectionId: string,
+  versionId: string,
+  verified: boolean
+): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not signed in" };
+
+  const { error } = await supabase
+    .from("resume_sections")
+    .update({
+      user_verified: verified,
+      verified_at: verified ? new Date().toISOString() : null,
+    })
+    .eq("id", sectionId)
+    .eq("user_id", user.id);
+
+  if (error) return { error: error.message };
+
+  revalidatePath(`/resume/${versionId}/review`);
+  return {};
+}
+
+export async function finalizeResumeVersion(
+  versionId: string,
+  _prevState: ActionState,
+  _formData: FormData
+): Promise<ActionState> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not signed in" };
+
+  const { data: sections } = await supabase
+    .from("resume_sections")
+    .select("id, user_verified")
+    .eq("resume_version_id", versionId);
+
+  const total = sections?.length ?? 0;
+  const unverifiedCount = (sections ?? []).filter((s) => !s.user_verified).length;
+
+  if (total === 0 || unverifiedCount > 0) {
+    return {
+      error:
+        total === 0
+          ? "This resume has no claims to verify."
+          : `${unverifiedCount} of ${total} claims still need review before this resume can be finalized.`,
+    };
+  }
+
+  const { error } = await supabase
+    .from("resume_versions")
+    .update({ status: "finalized", finalized_at: new Date().toISOString() })
+    .eq("id", versionId)
+    .eq("user_id", user.id);
+
+  if (error) return { error: error.message };
+
+  revalidatePath(`/resume/${versionId}`);
+  revalidatePath(`/resume/${versionId}/review`);
+  revalidatePath("/resume");
+  redirect(`/resume/${versionId}`);
+}
+
 export async function deleteResumeVersion(id: string) {
   const supabase = await createClient();
   const {

@@ -16,6 +16,7 @@ export type ResumeSectionType =
   | "experience_bullet"
   | "project_header"
   | "project_bullet";
+export type ResumeVersionStatus = "draft" | "finalized";
 
 export type Database = {
   public: {
@@ -418,6 +419,8 @@ export type Database = {
           based_on_version_id: string | null;
           label: string;
           version_number: number;
+          status: ResumeVersionStatus;
+          finalized_at: string | null;
           created_at: string;
         };
         Insert: {
@@ -427,6 +430,8 @@ export type Database = {
           based_on_version_id?: string | null;
           label: string;
           version_number: number;
+          status?: ResumeVersionStatus;
+          finalized_at?: string | null;
           created_at?: string;
         };
         Update: {
@@ -436,6 +441,8 @@ export type Database = {
           based_on_version_id?: string | null;
           label?: string;
           version_number?: number;
+          status?: ResumeVersionStatus;
+          finalized_at?: string | null;
           created_at?: string;
         };
         Relationships: [];
@@ -453,6 +460,8 @@ export type Database = {
           matched_accomplishment_id: string | null;
           matched_evidence_id: string | null;
           matched_skill_id: string | null;
+          user_verified: boolean;
+          verified_at: string | null;
           created_at: string;
         };
         Insert: {
@@ -467,6 +476,8 @@ export type Database = {
           matched_accomplishment_id?: string | null;
           matched_evidence_id?: string | null;
           matched_skill_id?: string | null;
+          user_verified?: boolean;
+          verified_at?: string | null;
           created_at?: string;
         };
         Update: {
@@ -481,6 +492,8 @@ export type Database = {
           matched_accomplishment_id?: string | null;
           matched_evidence_id?: string | null;
           matched_skill_id?: string | null;
+          user_verified?: boolean;
+          verified_at?: string | null;
           created_at?: string;
         };
         Relationships: [];

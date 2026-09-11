@@ -23,6 +23,24 @@ export function scoreRequirementDimension(matches: RequirementMatch[]): number {
   return points / matches.length;
 }
 
+// Shared "is this citation actually well-evidenced" rule — reused as-is by
+// Resume Engine's Truth Guard (lib/resume/citation-detail.ts) so a claim's
+// confidence badge always means the same thing here and there.
+export function isCitationWellEvidenced(
+  citation: { matchedSkillId?: string | null; matchedEvidenceId?: string | null },
+  skillEvidenceStrength: Map<string, string>,
+  evidenceVerified: Map<string, boolean>
+): boolean {
+  if (citation.matchedSkillId) {
+    const strength = skillEvidenceStrength.get(citation.matchedSkillId);
+    return strength === "direct" || strength === "adjacent";
+  }
+  if (citation.matchedEvidenceId) {
+    return evidenceVerified.get(citation.matchedEvidenceId) === true;
+  }
+  return false; // cited an experience/project/accomplishment with no evidence backing
+}
+
 export function scoreResumeRepresentation(
   matches: RequirementMatch[],
   skillEvidenceStrength: Map<string, string>,
@@ -31,16 +49,13 @@ export function scoreResumeRepresentation(
   const backed = matches.filter((m) => m.status !== "missing");
   if (backed.length === 0) return null;
 
-  const wellEvidenced = backed.filter((m) => {
-    if (m.matchedSkillId) {
-      const strength = skillEvidenceStrength.get(m.matchedSkillId);
-      return strength === "direct" || strength === "adjacent";
-    }
-    if (m.matchedEvidenceId) {
-      return evidenceVerified.get(m.matchedEvidenceId) === true;
-    }
-    return false; // cited an experience/accomplishment with no evidence backing
-  });
+  const wellEvidenced = backed.filter((m) =>
+    isCitationWellEvidenced(
+      { matchedSkillId: m.matchedSkillId, matchedEvidenceId: m.matchedEvidenceId },
+      skillEvidenceStrength,
+      evidenceVerified
+    )
+  );
 
   return wellEvidenced.length / backed.length;
 }

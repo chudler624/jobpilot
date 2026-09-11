@@ -5,6 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { GenerateResumeButton } from "@/components/resume/generate-resume-button";
 import { createClient } from "@/lib/supabase/server";
 import { generateResume } from "./actions";
@@ -43,8 +44,11 @@ export default async function ResumePage() {
           <Link href={`/resume/${master.id}`}>
             <Card className="transition-colors hover:bg-muted/50">
               <CardHeader>
-                <CardTitle>
+                <CardTitle className="flex items-center gap-2">
                   {master.label} (v{master.version_number})
+                  <Badge variant={master.status === "finalized" ? "secondary" : "outline"}>
+                    {master.status === "finalized" ? "Finalized" : "Draft"}
+                  </Badge>
                 </CardTitle>
                 <CardDescription>
                   Generated {new Date(master.created_at).toLocaleDateString()}
@@ -77,8 +81,11 @@ export default async function ResumePage() {
               <Link key={version.id} href={`/resume/${version.id}`}>
                 <Card className="transition-colors hover:bg-muted/50">
                   <CardHeader>
-                    <CardTitle>
+                    <CardTitle className="flex items-center gap-2">
                       {version.label} (v{version.version_number})
+                      <Badge variant={version.status === "finalized" ? "secondary" : "outline"}>
+                        {version.status === "finalized" ? "Finalized" : "Draft"}
+                      </Badge>
                     </CardTitle>
                     <CardDescription>
                       {job

@@ -5,9 +5,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { ResumePreview } from "@/components/resume/resume-preview";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { diffResumeSections } from "@/lib/resume/compare";
 import { SKIP_THRESHOLD } from "@/lib/match/recommend";
@@ -78,7 +80,12 @@ export default async function ResumeVersionPage({
     <div className="max-w-2xl space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">{version.label}</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-semibold">{version.label}</h1>
+            <Badge variant={version.status === "finalized" ? "secondary" : "outline"}>
+              {version.status === "finalized" ? "Finalized" : "Draft"}
+            </Badge>
+          </div>
           <p className="text-muted-foreground">
             v{version.version_number}
             {job
@@ -86,12 +93,20 @@ export default async function ResumeVersionPage({
               : ""}
           </p>
         </div>
-        <a
-          href={`/resume/${version.id}/download`}
-          className={buttonVariants()}
-        >
-          Download DOCX
-        </a>
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/resume/${version.id}/review`}
+            className={buttonVariants({ variant: "outline" })}
+          >
+            Review &amp; finalize
+          </Link>
+          <a
+            href={`/resume/${version.id}/download`}
+            className={buttonVariants()}
+          >
+            Download DOCX
+          </a>
+        </div>
       </div>
 
       {weakMatchScore !== null && (

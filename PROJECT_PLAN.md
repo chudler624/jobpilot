@@ -2,11 +2,11 @@
 
 ## Current Status
 
-Phase: 1 / 10
-Progress: 18% (Phases 0-1 of 10 complete)
+Phase: 2 / 10
+Progress: 27% (Phases 0-2 of 10 complete)
 
 Current Goal:
-Begin Phase 2 — Job Analyzer.
+Begin Phase 3 — Match Engine.
 
 ---
 
@@ -14,7 +14,7 @@ Begin Phase 2 — Job Analyzer.
 
 - [x] Phase 0 — Foundation
 - [x] Phase 1 — Career Profile
-- [ ] Phase 2 — Job Analyzer
+- [x] Phase 2 — Job Analyzer
 - [ ] Phase 3 — Match Engine
 - [ ] Phase 4 — Resume Engine
 - [ ] Phase 5 — Truth Guard
@@ -93,7 +93,7 @@ Create the verified source of truth for your professional experience — the dat
 
 ## Phase 2 — Job Analyzer
 
-**Status:** NOT STARTED
+**Status:** DONE
 
 ### Objective
 Turn a pasted job URL or description into structured, stored data.
@@ -109,11 +109,12 @@ Turn a pasted job URL or description into structured, stored data.
 - `job_requirements`
 
 ### Acceptance Criteria
-- [ ] Paste a URL → job saved with extracted fields
-- [ ] Paste raw text → same result
-- [ ] Original description snapshot stored verbatim
-- [ ] Errors handled gracefully (bad URL, unparseable content)
-- [ ] Build passes
+- [x] Paste a URL → job saved with extracted fields
+- [x] Paste raw text → same result
+- [x] Original description snapshot stored verbatim
+- [x] Errors handled gracefully (bad URL, unparseable content) — SSRF guard
+      verified against private/reserved IPs and non-http(s) schemes
+- [x] Build passes
 
 ---
 

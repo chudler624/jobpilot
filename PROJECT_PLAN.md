@@ -6,7 +6,7 @@ Phase: 6 / 10
 Progress: 60% (Phases 0-6 of 10 complete)
 
 Current Goal:
-Begin Phase 7 — Job Discovery.
+Live-test Phase 7 — Job Discovery on jobpilot-sandy.vercel.app.
 
 ---
 
@@ -337,28 +337,45 @@ Personal CRM for the job search.
 - [x] Dashboard reflects live counts — confirmed live: `getDashboardCounts()`
       wired into `/dashboard`, replacing the Phase 0 placeholder
 - [x] Build passes — typecheck, lint, and `next build` all clean
-- [ ] Status changes are tracked with timestamps
-- [ ] Dashboard reflects live counts
-- [ ] Build passes
 
 ---
 
 ## Phase 7 — Job Discovery
 
-**Status:** NOT STARTED
+**Status:** BUILT — awaiting live verification
 
 ### Objective
 Pull in jobs automatically instead of pasting one at a time.
 
 ### Features
-- Search by role, location, salary range, experience range, exclusions
-- Don't depend on scraping LinkedIn/Indeed directly (both prohibit automated scraping) — prefer company career pages / Greenhouse / Lever / Ashby / Workday, or manual paste-in as fallback
-- Auto-dedupe, analyze, and score incoming jobs
+- V1 source: Greenhouse's public Job Board API only (`watched_companies` —
+  user adds a company by its board token). Lever/Ashby/Workday explicitly
+  deferred, not built — see ADR-014. Manual paste-in (existing Job Analyzer)
+  remains the fallback for companies not on Greenhouse.
+- Search by role, location, salary range, experience range, exclusions —
+  Greenhouse's list API has no query params, so "search" here means "pick
+  watched companies" + filtering already-fetched results: role/location/
+  exclusions run pre-extraction (cheap, narrows what's inserted); salary/
+  experience run post-extraction over the already-processed set (experience
+  parsing reuses Match Engine's `parseMinYears`, not a new parser) — stated
+  explicitly per the planning constraint rather than silently dropped
+- Auto-dedupe on `source_url` via a partial unique index — duplicates are
+  skipped and counted, never used to overwrite an existing snapshot
+- Scoring reuses the existing `analyzeMatch` unchanged — no second scoring
+  mechanism. Extraction + scoring run synchronously per job, batched only
+  via sequential client-side calls (no queue/background worker)
+
+### Database
+- `watched_companies`
+- `jobs.source` (nullable — `'greenhouse'` or null for manual paste/URL)
 
 ### Acceptance Criteria
-- [ ] A search produces a ranked list of scored jobs
-- [ ] Duplicate jobs are not re-imported
-- [ ] Build passes
+- [ ] A search produces a ranked list of scored jobs — implemented via
+      watched-company fetch + pre/post-extraction filters + per-job
+      "Extract & score"; not yet live-tested
+- [ ] Duplicate jobs are not re-imported — enforced by a partial unique
+      index on `(user_id, source_url)`; not yet live-tested
+- [x] Build passes — typecheck, lint, and `next build` all clean
 
 ---
 

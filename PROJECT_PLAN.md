@@ -3,16 +3,18 @@
 ## Current Status
 
 Phase: 0 / 10
-Progress: 0%
+Progress: 9% (Phase 0 of 10 complete)
 
 Current Goal:
-Deploy basic Next.js application connected to Supabase, with a working dashboard shell.
+Retest live sign-in on Vercel once Supabase's default email rate limit
+resets (hit during Phase 0 verification), then begin Phase 1 — Career
+Profile.
 
 ---
 
 ## Roadmap
 
-- [ ] Phase 0 — Foundation
+- [x] Phase 0 — Foundation
 - [ ] Phase 1 — Career Profile
 - [ ] Phase 2 — Job Analyzer
 - [ ] Phase 3 — Match Engine
@@ -36,7 +38,7 @@ Deploy basic Next.js application connected to Supabase, with a working dashboard
 
 ## Phase 0 — Foundation
 
-**Status:** NOT STARTED
+**Status:** DONE
 
 ### Objective
 Get a bare-bones app deployed and connected to the database.
@@ -52,11 +54,12 @@ Get a bare-bones app deployed and connected to the database.
 - Auth (sign in / sign out)
 
 ### Acceptance Criteria
-- [ ] `https://<project>.vercel.app` loads
-- [ ] Can sign in via Supabase Auth
-- [ ] Dashboard shell renders with nav (Dashboard, Jobs, Applications, Resume, Career Profile, Analytics, Settings)
-- [ ] Supabase connection verified (a trivial read/write works)
-- [ ] Lint, typecheck, and build all pass
+- [x] `https://<project>.vercel.app` loads (https://jobpilot-sandy.vercel.app)
+- [x] Can sign in via Supabase Auth (verified locally end-to-end; production
+      retest pending Supabase's default email rate limit resetting)
+- [x] Dashboard shell renders with nav (Dashboard, Jobs, Applications, Resume, Career Profile, Analytics, Settings)
+- [x] Supabase connection verified (a trivial read/write works)
+- [x] Lint, typecheck, and build all pass
 
 ---
 

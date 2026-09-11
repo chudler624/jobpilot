@@ -2,11 +2,11 @@
 
 ## Current Status
 
-Phase: 2 / 10
-Progress: 27% (Phases 0-2 of 10 complete)
+Phase: 3 / 10
+Progress: 36% (Phases 0-3 of 10 complete)
 
 Current Goal:
-Begin Phase 3 — Match Engine.
+Begin Phase 4 — Resume Engine.
 
 ---
 
@@ -15,7 +15,7 @@ Begin Phase 3 — Match Engine.
 - [x] Phase 0 — Foundation
 - [x] Phase 1 — Career Profile
 - [x] Phase 2 — Job Analyzer
-- [ ] Phase 3 — Match Engine
+- [x] Phase 3 — Match Engine
 - [ ] Phase 4 — Resume Engine
 - [ ] Phase 5 — Truth Guard
 - [ ] Phase 6 — Application Tracker
@@ -120,7 +120,7 @@ Turn a pasted job URL or description into structured, stored data.
 
 ## Phase 3 — Match Engine
 
-**Status:** NOT STARTED
+**Status:** DONE
 
 ### Objective
 Score a job against the Career Profile and give a clear apply/skip recommendation — not a fake "ATS score."
@@ -135,10 +135,14 @@ Score a job against the Career Profile and give a clear apply/skip recommendatio
 - `job_scores`
 
 ### Acceptance Criteria
-- [ ] Given a job + career profile, a score and recommendation is generated
-- [ ] Every claim in the breakdown traces to a specific experience/skill/evidence row
-- [ ] Recommendation logic is inspectable, not a black box
-- [ ] Build passes
+- [x] Given a job + career profile, a score and recommendation is generated
+- [x] Every claim in the breakdown traces to a specific experience/skill/evidence row
+      — enforced by a DB check constraint, not just convention
+- [x] Recommendation logic is inspectable, not a black box — a single
+      function where "skip" is reachable through exactly one gate
+      (required-skills score); verified this can never fire on
+      preferred/domain/seniority/representation gaps alone
+- [x] Build passes
 
 ---
 

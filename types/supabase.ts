@@ -9,6 +9,13 @@ export type WorkplaceType = "remote" | "hybrid" | "onsite";
 export type Recommendation = "apply" | "apply_stretch" | "maybe" | "skip";
 export type RequirementType = "required" | "preferred" | "technology" | "domain";
 export type MatchStatus = "strong" | "partial" | "missing";
+export type ResumeSectionType =
+  | "summary_claim"
+  | "skill"
+  | "experience_header"
+  | "experience_bullet"
+  | "project_header"
+  | "project_bullet";
 
 export type Database = {
   public: {
@@ -399,6 +406,81 @@ export type Database = {
           matched_accomplishment_id?: string | null;
           matched_evidence_id?: string | null;
           rationale?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      resume_versions: {
+        Row: {
+          id: string;
+          user_id: string;
+          job_id: string | null;
+          based_on_version_id: string | null;
+          label: string;
+          version_number: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          job_id?: string | null;
+          based_on_version_id?: string | null;
+          label: string;
+          version_number: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          job_id?: string | null;
+          based_on_version_id?: string | null;
+          label?: string;
+          version_number?: number;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      resume_sections: {
+        Row: {
+          id: string;
+          user_id: string;
+          resume_version_id: string;
+          order_index: number;
+          section_type: ResumeSectionType;
+          content_text: string;
+          matched_experience_id: string | null;
+          matched_project_id: string | null;
+          matched_accomplishment_id: string | null;
+          matched_evidence_id: string | null;
+          matched_skill_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          resume_version_id: string;
+          order_index: number;
+          section_type: ResumeSectionType;
+          content_text: string;
+          matched_experience_id?: string | null;
+          matched_project_id?: string | null;
+          matched_accomplishment_id?: string | null;
+          matched_evidence_id?: string | null;
+          matched_skill_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          resume_version_id?: string;
+          order_index?: number;
+          section_type?: ResumeSectionType;
+          content_text?: string;
+          matched_experience_id?: string | null;
+          matched_project_id?: string | null;
+          matched_accomplishment_id?: string | null;
+          matched_evidence_id?: string | null;
+          matched_skill_id?: string | null;
           created_at?: string;
         };
         Relationships: [];

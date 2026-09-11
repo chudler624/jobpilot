@@ -102,10 +102,86 @@ export interface CareerProfileExtraction {
   skills: string[];
 }
 
+export type ResumeCitedType =
+  | "experience"
+  | "project"
+  | "accomplishment"
+  | "evidence"
+  | "skill";
+
+export interface ResumeClaim {
+  text: string;
+  citedType: ResumeCitedType;
+  citedId: string;
+}
+
+export interface ResumeExperienceSection {
+  experienceId: string;
+  bullets: ResumeClaim[];
+}
+
+export interface ResumeProjectSection {
+  projectId: string;
+  bullets: ResumeClaim[];
+}
+
+export interface ResumeContentPlan {
+  summaryClaims: ResumeClaim[];
+  includedSkillIds: string[];
+  experienceSections: ResumeExperienceSection[];
+  projectSections: ResumeProjectSection[];
+}
+
+export interface GenerateResumeContentInput {
+  // null job = Master Resume generation (no specific job to tailor toward)
+  job: { title: string | null; company: string | null } | null;
+  requirements: {
+    required: string[];
+    preferred: string[];
+    technologies: string[];
+  } | null;
+  // Phase 3's already-computed trace, passed as read-only context to guide
+  // emphasis/selection — never re-scored, never a substitute for this
+  // call's own independent citation verification.
+  matchContext: { requirementText: string; status: string; rationale: string }[] | null;
+  careerProfile: {
+    skills: { id: string; name: string; evidenceStrength: string }[];
+    experiences: {
+      id: string;
+      company: string;
+      title: string;
+      technologies: string[];
+      description: string | null;
+    }[];
+    projects: {
+      id: string;
+      name: string;
+      description: string | null;
+      technologies: string[];
+    }[];
+    accomplishments: {
+      id: string;
+      description: string;
+      experienceId: string | null;
+      projectId: string | null;
+    }[];
+    evidence: {
+      id: string;
+      title: string;
+      problem: string;
+      action: string;
+      result: string;
+    }[];
+  };
+}
+
 export interface AIProvider {
   extractJobFields(input: JobExtractionInput): Promise<JobExtractionResult>;
   mapJobRequirements(input: MapJobRequirementsInput): Promise<JobMatchMapping>;
   extractCareerProfile(
     input: ExtractCareerProfileInput
   ): Promise<CareerProfileExtraction>;
+  generateResumeContent(
+    input: GenerateResumeContentInput
+  ): Promise<ResumeContentPlan>;
 }

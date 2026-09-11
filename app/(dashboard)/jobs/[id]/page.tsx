@@ -8,8 +8,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { JobForm } from "@/components/jobs/job-form";
 import { MatchCard } from "@/components/jobs/match-card";
+import { ResumeCard } from "@/components/jobs/resume-card";
 import { createClient } from "@/lib/supabase/server";
 import { updateJob, deleteJob, analyzeMatch } from "../actions";
+import { generateResume } from "@/app/(dashboard)/resume/actions";
 
 function RequirementList({
   label,
@@ -46,6 +48,7 @@ export default async function JobDetailPage({
     { data: experiences },
     { data: accomplishments },
     { data: evidence },
+    { data: resumeVersions },
   ] = await Promise.all([
     supabase.from("jobs").select("*").eq("id", id).single(),
     supabase
@@ -58,6 +61,11 @@ export default async function JobDetailPage({
     supabase.from("experiences").select("id, company, title"),
     supabase.from("accomplishments").select("id, description"),
     supabase.from("evidence").select("id, title"),
+    supabase
+      .from("resume_versions")
+      .select("*")
+      .eq("job_id", id)
+      .order("version_number", { ascending: false }),
   ]);
 
   if (!job) notFound();
@@ -92,6 +100,11 @@ export default async function JobDetailPage({
         matches={matches ?? []}
         citationLabels={citationLabels}
         action={analyzeMatch.bind(null, id)}
+      />
+
+      <ResumeCard
+        versions={resumeVersions ?? []}
+        action={generateResume.bind(null, id)}
       />
 
       {requirements && (

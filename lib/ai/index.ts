@@ -19,4 +19,10 @@ export type {
   CareerProfileExtraction,
   ExtractedExperience,
   ExtractedProject,
+  ResumeCitedType,
+  ResumeClaim,
+  ResumeExperienceSection,
+  ResumeProjectSection,
+  ResumeContentPlan,
+  GenerateResumeContentInput,
 } from "./provider";

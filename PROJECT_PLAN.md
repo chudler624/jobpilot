@@ -6,7 +6,7 @@ Phase: 4 / 10
 Progress: 45% (Phases 0-4 of 10 complete)
 
 Current Goal:
-Begin Phase 5 — Truth Guard.
+Live-test Phase 5 — Truth Guard on jobpilot-sandy.vercel.app.
 
 ---
 
@@ -249,7 +249,7 @@ Generate a tailored, truthful resume from the Career Profile + a specific job.
 
 ## Phase 5 — Truth Guard
 
-**Status:** NOT STARTED
+**Status:** BUILT — awaiting live verification
 
 ### Objective
 Mandatory verification layer: every generated resume claim must trace to real evidence.

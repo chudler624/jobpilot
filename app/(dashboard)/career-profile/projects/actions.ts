@@ -3,41 +3,54 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { projectSchema, parseFormData } from "@/lib/career-profile/schemas";
+import {
+  projectSchema,
+  parseFormData,
+  type ActionState,
+} from "@/lib/career-profile/schemas";
 
-export async function createProject(formData: FormData) {
+export async function createProject(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const result = parseFormData(projectSchema, formData);
   if (!result.success) {
-    throw new Error(result.error.issues[0]?.message ?? "Invalid project");
+    return { error: result.error.issues[0]?.message ?? "Invalid project" };
   }
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return;
+  if (!user) return { error: "Not signed in" };
 
-  const { error } = await supabase
+  const { data: inserted, error } = await supabase
     .from("projects")
-    .insert({ ...result.data, user_id: user.id });
+    .insert({ ...result.data, user_id: user.id })
+    .select("id")
+    .single();
 
-  if (error) throw new Error(error.message);
+  if (error) return { error: error.message };
 
   revalidatePath("/career-profile/projects");
-  redirect("/career-profile/projects");
+  redirect(`/career-profile/projects/${inserted.id}`);
 }
 
-export async function updateProject(id: string, formData: FormData) {
+export async function updateProject(
+  id: string,
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const result = parseFormData(projectSchema, formData);
   if (!result.success) {
-    throw new Error(result.error.issues[0]?.message ?? "Invalid project");
+    return { error: result.error.issues[0]?.message ?? "Invalid project" };
   }
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return;
+  if (!user) return { error: "Not signed in" };
 
   const { error } = await supabase
     .from("projects")
@@ -45,7 +58,7 @@ export async function updateProject(id: string, formData: FormData) {
     .eq("id", id)
     .eq("user_id", user.id);
 
-  if (error) throw new Error(error.message);
+  if (error) return { error: error.message };
 
   revalidatePath("/career-profile/projects");
   redirect("/career-profile/projects");

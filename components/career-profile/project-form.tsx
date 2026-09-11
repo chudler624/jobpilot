@@ -1,8 +1,12 @@
+"use client";
+
+import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
+import type { ActionState } from "@/lib/career-profile/schemas";
 import type { Database } from "@/types/supabase";
 
 type Project = Database["public"]["Tables"]["projects"]["Row"];
@@ -13,12 +17,14 @@ export function ProjectForm({
   deleteAction,
 }: {
   project?: Project;
-  action: (formData: FormData) => Promise<void>;
+  action: (prevState: ActionState, formData: FormData) => Promise<ActionState>;
   deleteAction?: () => Promise<void>;
 }) {
+  const [state, formAction] = useActionState(action, {});
+
   return (
     <div className="space-y-6">
-      <form action={action} className="flex flex-col gap-4">
+      <form action={formAction} className="flex flex-col gap-4">
         <div className="space-y-1.5">
           <Label htmlFor="name">Name</Label>
           <Input id="name" name="name" required defaultValue={project?.name} />
@@ -28,8 +34,8 @@ export function ProjectForm({
           <Input
             id="url"
             name="url"
-            type="url"
-            placeholder="https://..."
+            type="text"
+            placeholder="https://... (optional)"
             defaultValue={project?.url ?? ""}
           />
         </div>
@@ -72,6 +78,9 @@ export function ProjectForm({
             defaultValue={project?.description ?? ""}
           />
         </div>
+        {state?.error && (
+          <p className="text-sm text-destructive">{state.error}</p>
+        )}
         <Button type="submit" className="self-start">
           {project ? "Save changes" : "Add project"}
         </Button>

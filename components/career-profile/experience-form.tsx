@@ -1,8 +1,12 @@
+"use client";
+
+import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
+import type { ActionState } from "@/lib/career-profile/schemas";
 import type { Database } from "@/types/supabase";
 
 type Experience = Database["public"]["Tables"]["experiences"]["Row"];
@@ -13,12 +17,14 @@ export function ExperienceForm({
   deleteAction,
 }: {
   experience?: Experience;
-  action: (formData: FormData) => Promise<void>;
+  action: (prevState: ActionState, formData: FormData) => Promise<ActionState>;
   deleteAction?: () => Promise<void>;
 }) {
+  const [state, formAction] = useActionState(action, {});
+
   return (
     <div className="space-y-6">
-      <form action={action} className="flex flex-col gap-4">
+      <form action={formAction} className="flex flex-col gap-4">
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <Label htmlFor="company">Company</Label>
@@ -90,6 +96,9 @@ export function ExperienceForm({
             defaultValue={experience?.description ?? ""}
           />
         </div>
+        {state?.error && (
+          <p className="text-sm text-destructive">{state.error}</p>
+        )}
         <Button type="submit" className="self-start">
           {experience ? "Save changes" : "Add experience"}
         </Button>

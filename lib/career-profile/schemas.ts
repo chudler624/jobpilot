@@ -103,3 +103,5 @@ export function parseFormData<T extends z.ZodType>(
 ) {
   return schema.safeParse(Object.fromEntries(formData));
 }
+
+export type ActionState = { error?: string };

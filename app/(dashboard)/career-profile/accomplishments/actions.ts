@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   accomplishmentSchema,
   parseFormData,
+  type ActionState,
 } from "@/lib/career-profile/schemas";
 
 type Parent = { experienceId: string } | { projectId: string };
@@ -15,19 +16,23 @@ function parentPath(parent: Parent) {
     : `/career-profile/projects/${parent.projectId}`;
 }
 
-export async function createAccomplishment(parent: Parent, formData: FormData) {
+export async function createAccomplishment(
+  parent: Parent,
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const result = parseFormData(accomplishmentSchema, formData);
   if (!result.success) {
-    throw new Error(
-      result.error.issues[0]?.message ?? "Invalid accomplishment"
-    );
+    return {
+      error: result.error.issues[0]?.message ?? "Invalid accomplishment",
+    };
   }
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return;
+  if (!user) return { error: "Not signed in" };
 
   const { error } = await supabase.from("accomplishments").insert({
     ...result.data,
@@ -36,28 +41,30 @@ export async function createAccomplishment(parent: Parent, formData: FormData) {
     project_id: "projectId" in parent ? parent.projectId : null,
   });
 
-  if (error) throw new Error(error.message);
+  if (error) return { error: error.message };
 
   revalidatePath(parentPath(parent));
+  return {};
 }
 
 export async function updateAccomplishment(
   id: string,
   parent: Parent,
+  _prevState: ActionState,
   formData: FormData
-) {
+): Promise<ActionState> {
   const result = parseFormData(accomplishmentSchema, formData);
   if (!result.success) {
-    throw new Error(
-      result.error.issues[0]?.message ?? "Invalid accomplishment"
-    );
+    return {
+      error: result.error.issues[0]?.message ?? "Invalid accomplishment",
+    };
   }
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return;
+  if (!user) return { error: "Not signed in" };
 
   const { error } = await supabase
     .from("accomplishments")
@@ -65,9 +72,10 @@ export async function updateAccomplishment(
     .eq("id", id)
     .eq("user_id", user.id);
 
-  if (error) throw new Error(error.message);
+  if (error) return { error: error.message };
 
   revalidatePath(parentPath(parent));
+  return {};
 }
 
 export async function deleteAccomplishment(id: string, parent: Parent) {

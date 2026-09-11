@@ -15,10 +15,16 @@ export function EvidencePicker({
   defaultValue?: string | null;
   required?: boolean;
 }) {
+  const items: Record<string, string> = { "": "No evidence linked" };
+  for (const evidence of evidenceOptions) {
+    items[evidence.id] = evidence.title;
+  }
+
   return (
     <Select
       name="evidence_id"
       defaultValue={defaultValue ?? ""}
+      items={items}
       required={required}
     >
       <SelectTrigger className="w-full">

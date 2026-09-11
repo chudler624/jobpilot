@@ -1,3 +1,6 @@
+"use client";
+
+import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { EvidencePicker } from "@/components/career-profile/evidence-picker";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
+import type { ActionState } from "@/lib/career-profile/schemas";
 import type { Database } from "@/types/supabase";
 
 type Skill = Database["public"]["Tables"]["skills"]["Row"];
@@ -30,12 +34,14 @@ export function SkillForm({
 }: {
   skill?: Skill;
   evidenceOptions: { id: string; title: string }[];
-  action: (formData: FormData) => Promise<void>;
+  action: (prevState: ActionState, formData: FormData) => Promise<ActionState>;
   deleteAction?: () => Promise<void>;
 }) {
+  const [state, formAction] = useActionState(action, {});
+
   return (
     <div className="space-y-6">
-      <form action={action} className="flex flex-col gap-4">
+      <form action={formAction} className="flex flex-col gap-4">
         <div className="space-y-1.5">
           <Label htmlFor="name">Name</Label>
           <Input id="name" name="name" required defaultValue={skill?.name} />
@@ -45,6 +51,7 @@ export function SkillForm({
           <Select
             name="evidence_strength"
             defaultValue={skill?.evidence_strength ?? "none"}
+            items={STRENGTH_LABELS}
             required
           >
             <SelectTrigger className="w-full">
@@ -78,6 +85,9 @@ export function SkillForm({
             defaultValue={skill?.notes ?? ""}
           />
         </div>
+        {state?.error && (
+          <p className="text-sm text-destructive">{state.error}</p>
+        )}
         <Button type="submit" className="self-start">
           {skill ? "Save changes" : "Add skill"}
         </Button>

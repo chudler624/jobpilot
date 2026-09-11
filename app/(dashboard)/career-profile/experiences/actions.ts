@@ -3,41 +3,54 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { experienceSchema, parseFormData } from "@/lib/career-profile/schemas";
+import {
+  experienceSchema,
+  parseFormData,
+  type ActionState,
+} from "@/lib/career-profile/schemas";
 
-export async function createExperience(formData: FormData) {
+export async function createExperience(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const result = parseFormData(experienceSchema, formData);
   if (!result.success) {
-    throw new Error(result.error.issues[0]?.message ?? "Invalid experience");
+    return { error: result.error.issues[0]?.message ?? "Invalid experience" };
   }
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return;
+  if (!user) return { error: "Not signed in" };
 
-  const { error } = await supabase
+  const { data: inserted, error } = await supabase
     .from("experiences")
-    .insert({ ...result.data, user_id: user.id });
+    .insert({ ...result.data, user_id: user.id })
+    .select("id")
+    .single();
 
-  if (error) throw new Error(error.message);
+  if (error) return { error: error.message };
 
   revalidatePath("/career-profile/experiences");
-  redirect("/career-profile/experiences");
+  redirect(`/career-profile/experiences/${inserted.id}`);
 }
 
-export async function updateExperience(id: string, formData: FormData) {
+export async function updateExperience(
+  id: string,
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const result = parseFormData(experienceSchema, formData);
   if (!result.success) {
-    throw new Error(result.error.issues[0]?.message ?? "Invalid experience");
+    return { error: result.error.issues[0]?.message ?? "Invalid experience" };
   }
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return;
+  if (!user) return { error: "Not signed in" };
 
   const { error } = await supabase
     .from("experiences")
@@ -45,7 +58,7 @@ export async function updateExperience(id: string, formData: FormData) {
     .eq("id", id)
     .eq("user_id", user.id);
 
-  if (error) throw new Error(error.message);
+  if (error) return { error: error.message };
 
   revalidatePath("/career-profile/experiences");
   redirect("/career-profile/experiences");

@@ -15,4 +15,8 @@ export type {
   DomainAssessment,
   MatchStatus,
   RequirementType,
+  ExtractCareerProfileInput,
+  CareerProfileExtraction,
+  ExtractedExperience,
+  ExtractedProject,
 } from "./provider";

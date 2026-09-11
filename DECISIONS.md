@@ -36,3 +36,11 @@
 ## ADR-009 — No LinkedIn/Indeed scraping dependency
 **Decision:** Primary job discovery relies on company career pages and ATS platforms (Greenhouse, Lever, Ashby, Workday, etc.) or manual paste-in, not scraping LinkedIn or Indeed directly.
 **Reason:** Both platforms prohibit automated scraping in their terms; building a dependency on it makes the product fragile and puts the account at risk.
+
+## ADR-010 — Resume import requires human review before persisting
+**Decision:** AI-extracted Career Profile data from an uploaded resume (Phase 1.5) is never auto-saved. It's shown in an editable review screen (include/exclude, edit any field) and only written to the database after explicit user confirmation.
+**Reason:** Every other AI flow in the app has an automated truth-check available — a zod schema validates shape, and where the AI cites an existing row (Match Engine, Resume Engine), code independently verifies that citation against the real profile. Resume import has no such net: the AI is *creating* new claims about the user's history, not citing existing ones, so there's nothing pre-existing to verify against. Human review is the truth-check for this specific flow, not a UX nicety.
+
+## ADR-011 — Resume file text extraction: unpdf + mammoth
+**Decision:** Use `unpdf` for PDF text extraction and `mammoth` for DOCX text extraction (reading existing files), for the Phase 1.5 resume-import feature.
+**Reason:** `unpdf` is built for serverless/edge runtimes (matches Vercel), verified actively maintained (checked npm registry directly rather than assumed). `mammoth` is the established library for converting existing `.docx` content to text. Both are distinct from `docx` (Phase 4's planned generation library), which can write new `.docx` files but cannot usefully read arbitrary existing ones back out.

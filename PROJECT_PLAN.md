@@ -6,7 +6,8 @@ Phase: 3 / 10
 Progress: 36% (Phases 0-3 of 10 complete)
 
 Current Goal:
-Begin Phase 4 — Resume Engine.
+Verify Phase 1.5 (Career Profile Import) live, then begin Phase 4 —
+Resume Engine.
 
 ---
 
@@ -14,6 +15,7 @@ Begin Phase 4 — Resume Engine.
 
 - [x] Phase 0 — Foundation
 - [x] Phase 1 — Career Profile
+- [ ] Phase 1.5 — Career Profile Import (added mid-Phase-4 planning, not in the original 0-10 roadmap)
 - [x] Phase 2 — Job Analyzer
 - [x] Phase 3 — Match Engine
 - [ ] Phase 4 — Resume Engine
@@ -88,6 +90,60 @@ Create the verified source of truth for your professional experience — the dat
 - [x] Can associate evidence with an accomplishment
 - [x] Data persists in Supabase, scoped to the user
 - [x] Build passes
+
+---
+
+## Phase 1.5 — Career Profile Import
+
+**Status:** BUILT — pending live verification
+
+Added mid-Phase-4-planning, not part of the original Phase 0-10 roadmap —
+requested to give Match Engine (Phase 3) and Resume Engine (Phase 4)
+realistic data to be tested against instead of sparse manually-entered
+test rows. Architecturally a Career Profile (Phase 1) concern: it only
+populates `experiences`/`accomplishments`/`skills`/`projects` and touches
+none of Phase 4's resume-generation tables.
+
+### Objective
+Bootstrap a Career Profile from an existing resume file, as a starting
+baseline the user reviews and edits — not a substitute for manually
+authoring real Evidence entries.
+
+### Features
+- Upload a PDF or DOCX resume; AI extracts experiences, projects, and
+  skills
+- **Nothing is auto-saved.** Unlike every other AI flow in the app (which
+  has an automated truth-check — schema validation, citation verification
+  against existing rows), import has no pre-existing profile to verify
+  extracted claims against. The extracted data is shown in an editable
+  review screen (include/exclude, edit any field) and only written to the
+  database after explicit confirmation — human review is the truth-check
+  for this specific feature.
+- Imported skills always get `evidence_strength: 'none'` — a bare resume
+  mention isn't the same as real evidence; the DB already refuses
+  `'direct'` without a linked evidence row, so upgrading a skill's
+  strength is a deliberate next step the user takes manually.
+- Evidence entries are **not** auto-generated from resume bullets —
+  expanding a compressed bullet into invented Problem/Action/Result
+  fields would itself be a form of inventing narrative structure not
+  actually present in the source. Evidence stays a deliberately
+  user-authored artifact.
+- Duplicate skill names (case-insensitive) against the existing profile
+  are skipped, not re-inserted.
+
+### Database
+No new tables — inserts directly into `experiences`, `accomplishments`,
+`skills`, `projects` via the existing schema.
+
+### Acceptance Criteria
+- [ ] Upload a PDF resume → extracted experiences/projects/skills shown
+      for review before anything is saved
+- [ ] Upload a DOCX resume → same result
+- [ ] Can exclude or edit any extracted item before saving
+- [ ] Confirmed items are saved as real Career Profile rows, scoped to the
+      user
+- [x] Build passes (lint/typecheck/build all pass; live browser testing —
+      including the file upload itself — still pending)
 
 ---
 

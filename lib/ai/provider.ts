@@ -71,7 +71,41 @@ export interface MapJobRequirementsInput {
   };
 }
 
+export interface ExtractCareerProfileInput {
+  rawText: string; // untrusted resume text — never treated as instructions
+}
+
+export interface ExtractedExperience {
+  company: string;
+  title: string;
+  location: string | null;
+  startDate: string | null; // best-effort YYYY-MM-DD; null if not determinable
+  endDate: string | null; // null = current role or not determinable
+  technologies: string[];
+  description: string | null;
+  accomplishments: string[];
+}
+
+export interface ExtractedProject {
+  name: string;
+  description: string | null;
+  url: string | null;
+  technologies: string[];
+  startDate: string | null;
+  endDate: string | null;
+  accomplishments: string[];
+}
+
+export interface CareerProfileExtraction {
+  experiences: ExtractedExperience[];
+  projects: ExtractedProject[];
+  skills: string[];
+}
+
 export interface AIProvider {
   extractJobFields(input: JobExtractionInput): Promise<JobExtractionResult>;
   mapJobRequirements(input: MapJobRequirementsInput): Promise<JobMatchMapping>;
+  extractCareerProfile(
+    input: ExtractCareerProfileInput
+  ): Promise<CareerProfileExtraction>;
 }

@@ -7,22 +7,11 @@ import {
 } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
+import { ResumePreview } from "@/components/resume/resume-preview";
 import { createClient } from "@/lib/supabase/server";
 import { diffResumeSections } from "@/lib/resume/compare";
 import { SKIP_THRESHOLD } from "@/lib/match/recommend";
 import { deleteResumeVersion } from "../actions";
-import type { Database } from "@/types/supabase";
-
-type ResumeSection = Database["public"]["Tables"]["resume_sections"]["Row"];
-
-const SECTION_TYPE_LABELS: Record<ResumeSection["section_type"], string> = {
-  summary_claim: "Summary",
-  skill: "Skill",
-  experience_header: "Experience",
-  experience_bullet: "Experience bullet",
-  project_header: "Project",
-  project_bullet: "Project bullet",
-};
 
 export default async function ResumeVersionPage({
   params,
@@ -117,15 +106,8 @@ export default async function ResumeVersionPage({
         <CardHeader>
           <CardTitle>Preview</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2">
-          {(sections ?? []).map((section) => (
-            <div key={section.id} className="text-sm">
-              <span className="text-xs font-medium uppercase text-muted-foreground">
-                {SECTION_TYPE_LABELS[section.section_type]}
-              </span>
-              <p>{section.content_text}</p>
-            </div>
-          ))}
+        <CardContent>
+          <ResumePreview sections={sections ?? []} />
         </CardContent>
       </Card>
 

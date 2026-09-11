@@ -6,7 +6,10 @@ Phase: 7 / 10
 Progress: 70% (Phases 0-7 of 10 complete)
 
 Current Goal:
-Begin Phase 8 — Application Assistant.
+Manually load and live-test Phase 8 — Application Assistant (browser
+extension) — see extension/README.md. This is the first phase I
+genuinely cannot verify myself (no way to drive a real browser from
+here), so it needs a manual pass before it can be marked done.
 
 ---
 
@@ -387,21 +390,49 @@ Pull in jobs automatically instead of pasting one at a time.
 
 ## Phase 8 — Application Assistant
 
-**Status:** NOT STARTED
+**Status:** BUILT — awaiting manual browser verification (see
+extension/README.md; this is the first phase I have no way to test
+myself, not a case of skipping optional verification)
 
 ### Objective
 Speed up manual application submission without submitting on your behalf.
 
 ### Features
-- Separate browser extension (not part of the core Next.js app) that detects form fields on an application page
-- Pulls answers from the verified career database (including binary answers like years of experience — answered honestly, not creatively)
-- You review and submit manually — no automated submission in this phase
+- Separate browser extension (`extension/`, Vite + Manifest V3) — not
+  part of the core Next.js app, own `package.json`/toolchain
+- Auth: embeds the Supabase client directly, 6-digit email-OTP sign-in
+  typed into the popup; every read goes through the same RLS policies
+  as the main app — no new API surface, no token system (ADR-015)
+- Detects form fields on the current tab only when the user clicks
+  "Detect fields" (on-demand injection via `activeTab`, no persistent
+  content script, no broad host permissions)
+- Pulls answers from the verified Career Profile — years of experience
+  computed via the existing `computeExperienceYears` (reused from Match
+  Engine, not reimplemented), skill yes/no and work authorization read
+  as stored facts, never inferred
+- Structured/factual answers only this phase — no AI-generated prose
+- You review and fill manually, per field; nothing is ever submitted —
+  enforced structurally (no submit action exists in the content
+  script's message protocol at all)
+- Two schema gaps found and fixed while building: `profiles` gained
+  `work_authorization_status`, `requires_sponsorship`, and `phone` —
+  none of this existed anywhere in the Career Profile before
+
+### Database
+- `profiles.work_authorization_status`, `profiles.requires_sponsorship`, `profiles.phone`
 
 ### Acceptance Criteria
-- [ ] Extension detects and lists fields on a real application form
-- [ ] Suggested answers are pulled from stored, verified data
-- [ ] Nothing is submitted without manual action
-- [ ] Build passes
+- [ ] Extension detects and lists fields on a real application form —
+      implemented; needs a manual load-unpacked + real-page pass
+- [ ] Suggested answers are pulled from stored, verified data —
+      derivation logic verified via throwaway test scripts (cross-checked
+      against Match Engine's own experience-years output); live UI pass
+      still needed
+- [x] Nothing is submitted without manual action — structurally enforced
+      (no submit action exists in the codebase), verifiable by reading
+      `extension/src/lib/messages.ts` and `extension/src/content/index.ts`
+- [x] Build passes — both the main app and the extension package
+      typecheck and build clean
 
 ---
 

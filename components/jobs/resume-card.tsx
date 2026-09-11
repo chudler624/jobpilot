@@ -10,19 +10,24 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { SKIP_THRESHOLD } from "@/lib/match/recommend";
 import type { ActionState } from "@/lib/career-profile/schemas";
 import type { Database } from "@/types/supabase";
 
 type ResumeVersion = Database["public"]["Tables"]["resume_versions"]["Row"];
+type JobScore = Database["public"]["Tables"]["job_scores"]["Row"];
 
 export function ResumeCard({
   versions,
+  score,
   action,
 }: {
   versions: ResumeVersion[];
+  score: JobScore | null;
   action: (prevState: ActionState, formData: FormData) => Promise<ActionState>;
 }) {
   const [state, formAction, isPending] = useActionState(action, {});
+  const weakMatch = score !== null && score.required_skills_score < SKIP_THRESHOLD;
 
   return (
     <Card>
@@ -44,11 +49,23 @@ export function ResumeCard({
             ))}
           </ul>
         )}
+        {weakMatch && (
+          <p className="text-sm text-destructive">
+            Required-skills match is only{" "}
+            {Math.round(score!.required_skills_score * 100)}% — generation
+            will be refused. Analyze match again after improving your
+            Career Profile, or reconsider this job.
+          </p>
+        )}
         {state?.error && (
           <p className="text-sm text-destructive">{state.error}</p>
         )}
         <form action={formAction}>
-          <Button type="submit" variant="outline" disabled={isPending}>
+          <Button
+            type="submit"
+            variant="outline"
+            disabled={isPending || weakMatch}
+          >
             {isPending
               ? "Generating..."
               : versions.length > 0

@@ -104,6 +104,7 @@ export default async function JobDetailPage({
 
       <ResumeCard
         versions={resumeVersions ?? []}
+        score={score ?? null}
         action={generateResume.bind(null, id)}
       />
 

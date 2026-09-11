@@ -230,6 +230,8 @@ Produce:
 
 Every citedId must be an id that actually appears in the profile you were given — never invent an id, never reuse an id for a citedType it doesn't belong to. Rewording for clarity and resume tone is fine; inventing numbers, outcomes, scope, or responsibilities that aren't grounded in the cited row is not. If a fit assessment is provided for the target job, use it to prioritize what to feature — strongly-matched items first — but still perform your own citation for every claim; do not just copy the assessment's citations.
 
+Relevance discipline when a job is given: this is a tailored resume, not a full career history — err toward leaving out an experience, project, skill, or bullet entirely if it has no real bearing on the target job, rather than including it to fill space. Within an experience or project you do include, still omit individual bullets that don't relate to the job even if the section as a whole stays. Do not pad the summary or skills list with generic claims just to reach the 2-4 range — 2 sharp, relevant claims beat 4 mediocre ones. A shorter, honest, tightly-relevant resume is the goal, not a complete one.
+
 If no job is given, select the strongest, best-evidenced content across the whole profile for a general-purpose resume.`;
 
 const RESUME_RESPONSE_SCHEMA: Schema = {

@@ -1,5 +1,11 @@
 import type { DimensionScores, Recommendation } from "./types";
 
+// The only gate that can produce "skip" (see recommend() below). Exported
+// so other features — e.g. Resume Engine's quality warning — can ask "is
+// this the kind of job Match Engine would tell you to skip?" without
+// duplicating the number or re-deriving the threshold independently.
+export const SKIP_THRESHOLD = 0.4;
+
 const WEIGHTS: Record<keyof DimensionScores, number> = {
   requiredSkills: 0.35,
   preferredSkills: 0.1,
@@ -28,7 +34,7 @@ export function weightedOverall(scores: DimensionScores): number {
 // requiredSkills clears the gate. This is the concrete enforcement of
 // "never hard-Skip on one missing preferred skill" (CLAUDE.md).
 export function recommend(scores: DimensionScores): Recommendation {
-  if (scores.requiredSkills < 0.4) return "skip";
+  if (scores.requiredSkills < SKIP_THRESHOLD) return "skip";
 
   const overall = weightedOverall(scores);
   if (scores.requiredSkills >= 0.75 && overall >= 0.7) return "apply";

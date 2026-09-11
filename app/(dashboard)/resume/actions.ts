@@ -9,6 +9,7 @@ import {
   findFabricatedResumeCitation,
 } from "@/lib/resume/schemas";
 import { experienceHeaderText, projectHeaderText } from "@/lib/resume/header-text";
+import { SKIP_THRESHOLD } from "@/lib/match/recommend";
 import type { ActionState } from "@/lib/career-profile/schemas";
 import type { Database } from "@/types/supabase";
 
@@ -89,6 +90,17 @@ export async function generateResume(
       .select("*")
       .eq("job_id", jobId)
       .maybeSingle();
+
+    // Same gate Match Engine uses for "skip" — if your profile's required-
+    // skills match is this weak, no amount of clever wording produces a
+    // genuinely strong tailored resume. Refuse rather than generate
+    // something that reads as padded or dishonest.
+    if (score && score.required_skills_score < SKIP_THRESHOLD) {
+      return {
+        error: `Required-skills match for this job is too weak (${Math.round(score.required_skills_score * 100)}%) to produce a quality tailored resume. Consider whether this role is a good fit, or build out your Career Profile first.`,
+      };
+    }
+
     if (score) {
       const { data: matches } = await supabase
         .from("job_score_matches")

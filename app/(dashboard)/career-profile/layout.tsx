@@ -11,8 +11,8 @@ export default function CareerProfileLayout({
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Career Profile</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-[26px] leading-tight font-medium">Career Profile</h1>
+          <p className="mt-1 text-[15px] text-muted-foreground">
             The verified source of truth everything else in jobpilot will
             eventually read from.
           </p>

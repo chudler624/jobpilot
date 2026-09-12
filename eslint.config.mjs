@@ -27,6 +27,9 @@ const eslintConfig = defineConfig([
     // The browser extension is its own package with its own toolchain
     // (see extension/package.json) — not part of the Next.js app.
     "extension/**",
+    // Design reference mockups — visual ground truth for the restyle,
+    // never built or shipped.
+    "design_handoff_jobpilot_restyle/**",
   ]),
 ]);
 

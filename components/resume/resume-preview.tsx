@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { VerifiedMarker } from "@/components/ui/verified-marker";
 import { groupByHeader } from "@/lib/resume/group-sections";
 import type { Database } from "@/types/supabase";
 
@@ -24,7 +25,7 @@ export function ResumePreview({ sections }: { sections: ResumeSection[] }) {
     <div className="space-y-5 text-sm">
       {summaryClaims.length > 0 && (
         <div className="space-y-1">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <h3 className="text-[13px] font-medium text-muted-foreground">
             Summary
           </h3>
           <p>{summaryClaims.map((c) => c.content_text).join(" ")}</p>
@@ -33,12 +34,12 @@ export function ResumePreview({ sections }: { sections: ResumeSection[] }) {
 
       {skills.length > 0 && (
         <div className="space-y-1.5">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <h3 className="text-[13px] font-medium text-muted-foreground">
             Skills
           </h3>
           <div className="flex flex-wrap gap-1.5">
             {skills.map((s) => (
-              <Badge key={s.id} variant="secondary">
+              <Badge key={s.id} variant="outline">
                 {s.content_text}
               </Badge>
             ))}
@@ -48,15 +49,18 @@ export function ResumePreview({ sections }: { sections: ResumeSection[] }) {
 
       {experienceGroups.length > 0 && (
         <div className="space-y-3">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <h3 className="text-[13px] font-medium text-muted-foreground">
             Experience
           </h3>
           {experienceGroups.map((group) => (
             <div key={group.header.id}>
               <p className="font-medium">{group.header.content_text}</p>
-              <ul className="list-inside list-disc text-muted-foreground">
+              <ul className="mt-1 flex flex-col gap-1">
                 {group.bullets.map((b) => (
-                  <li key={b.id}>{b.content_text}</li>
+                  <li key={b.id} className="flex gap-2.5">
+                    <VerifiedMarker verified={b.user_verified} className="mt-[7px]" />
+                    <span className="flex-1">{b.content_text}</span>
+                  </li>
                 ))}
               </ul>
             </div>
@@ -66,15 +70,18 @@ export function ResumePreview({ sections }: { sections: ResumeSection[] }) {
 
       {projectGroups.length > 0 && (
         <div className="space-y-3">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <h3 className="text-[13px] font-medium text-muted-foreground">
             Projects
           </h3>
           {projectGroups.map((group) => (
             <div key={group.header.id}>
               <p className="font-medium">{group.header.content_text}</p>
-              <ul className="list-inside list-disc text-muted-foreground">
+              <ul className="mt-1 flex flex-col gap-1">
                 {group.bullets.map((b) => (
-                  <li key={b.id}>{b.content_text}</li>
+                  <li key={b.id} className="flex gap-2.5">
+                    <VerifiedMarker verified={b.user_verified} className="mt-[7px]" />
+                    <span className="flex-1">{b.content_text}</span>
+                  </li>
                 ))}
               </ul>
             </div>

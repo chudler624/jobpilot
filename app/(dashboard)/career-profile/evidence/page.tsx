@@ -32,7 +32,7 @@ export default async function EvidencePage() {
       <div className="grid gap-4">
         {evidence?.map((entry) => (
           <Link key={entry.id} href={`/career-profile/evidence/${entry.id}`}>
-            <Card className="transition-colors hover:bg-muted/50">
+            <Card className="transition-colors hover:bg-secondary">
               <CardHeader className="flex flex-row items-start justify-between">
                 <div>
                   <CardTitle>{entry.title}</CardTitle>

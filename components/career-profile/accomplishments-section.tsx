@@ -16,7 +16,7 @@ export function AccomplishmentsSection({
 }) {
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold">Accomplishments</h2>
+      <h2 className="text-lg font-medium">Accomplishments</h2>
 
       {accomplishments.map((accomplishment) => (
         <AccomplishmentEditForm

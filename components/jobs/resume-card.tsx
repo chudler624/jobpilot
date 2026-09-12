@@ -61,7 +61,7 @@ export function ResumeCard({
           <p className="text-sm text-destructive">{state.error}</p>
         )}
         <form action={formAction}>
-          <Button type="submit" variant="outline" disabled={isPending}>
+          <Button type="submit" disabled={isPending}>
             {isPending
               ? "Generating..."
               : versions.length > 0

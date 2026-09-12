@@ -30,7 +30,7 @@ export function ApplicationCard({
       <CardContent>
         {application ? (
           <Link href={`/applications/${application.id}`} className="inline-flex items-center gap-2">
-            <Badge>{STATUS_LABELS[application.status]}</Badge>
+            <Badge variant="ink">{STATUS_LABELS[application.status]}</Badge>
             <span className="text-sm underline">View application</span>
           </Link>
         ) : (
@@ -38,6 +38,7 @@ export function ApplicationCard({
             action={action}
             label="Track this application"
             pendingLabel="Adding..."
+            variant="outline"
           />
         )}
       </CardContent>

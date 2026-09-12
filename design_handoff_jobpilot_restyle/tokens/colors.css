@@ -1,0 +1,41 @@
+/* jobpilot color system — two brand colors on neutral paper.
+   Cobalt is earned: it marks the single most important action or state
+   on a screen, never a background wash. No gradients, ever. */
+:root {
+  /* Brand — the only two "colors" */
+  --graphite: #1C1B19;   /* primary ink: text, wordmark, structure */
+  --cobalt:   #23479E;   /* the one accent: airplane, primary action, strong match */
+
+  /* Neutrals — the paper the two colors sit on (not "colors") */
+  --paper:    #F5F5F2;   /* page background: warm off-white, not cream, not stark white */
+  --white:    #FFFFFF;   /* raised panel / card surface */
+  --hairline: #E1DFD9;   /* dividers and panel borders only */
+  --slate:    #8A8477;   /* secondary / muted text */
+
+  /* Interaction shades (derived, used sparingly) */
+  --cobalt-press: #1C3A82;   /* cobalt pressed / hover-darken */
+  --cobalt-tint:  #EDF0F7;   /* faintest cobalt fill for a selected row — used rarely */
+  --graphite-hover: #2A2825; /* graphite button hover */
+  --paper-hover:  #EDECE7;   /* neutral row / ghost hover on paper */
+
+  /* ---- Semantic aliases: reference these in components ---- */
+  --text-primary:   var(--graphite);
+  --text-muted:     var(--slate);
+  --text-on-accent: var(--white);
+  --text-on-ink:    var(--paper);
+
+  --surface-page:   var(--paper);
+  --surface-card:   var(--white);
+  --surface-inset:  var(--paper);
+  --surface-select: var(--cobalt-tint);
+
+  --border-hairline: var(--hairline);
+
+  --accent:         var(--cobalt);
+  --accent-press:   var(--cobalt-press);
+
+  /* State ink — verified/unverified is shape, not color, so both are neutral ink.
+     "Missing" and "unverified" are ordinary expected states, never red alarms. */
+  --state-ink:      var(--graphite);
+  --state-muted:    var(--slate);
+}

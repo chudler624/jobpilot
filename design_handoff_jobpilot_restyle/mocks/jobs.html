@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>jobpilot — Jobs</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--paper);color:var(--graphite);font-family:var(--font-sans);font-size:15px}
+  button{font-family:inherit}
+  a{color:var(--cobalt);text-decoration:none}
+  .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+  .app{display:flex;min-height:100vh}
+  .side{width:224px;flex:0 0 auto;background:var(--paper);border-right:1px solid var(--hairline);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+  .brand{padding:20px 20px 16px}
+  .brand img{height:24px;width:auto;display:block}
+  .nav{display:flex;flex-direction:column;gap:2px;padding:8px 12px}
+  .navitem{display:block;padding:8px 12px;border-radius:6px;font-size:14px;font-weight:500;color:var(--slate);cursor:pointer;transition:background var(--duration) var(--ease-standard),color var(--duration) var(--ease-standard)}
+  .navitem:hover{background:var(--paper-hover);color:var(--graphite)}
+  .navitem.active{background:var(--graphite);color:var(--paper)}
+  .side-foot{margin-top:auto;border-top:1px solid var(--hairline);padding:16px}
+  .side-foot .email{font-size:12px;color:var(--slate);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .main{flex:1;min-width:0;padding:40px 48px;max-width:1000px}
+  h1.page{font-size:26px;font-weight:500;margin:0}
+  .sub{color:var(--slate);font-size:15px;margin:4px 0 0}
+  .head{display:flex;align-items:flex-start;justify-content:space-between;gap:24px}
+  .actions{display:flex;gap:10px;flex:0 0 auto}
+  .panel{background:var(--white);border:1px solid var(--hairline);border-radius:6px}
+  .list{display:flex;flex-direction:column;gap:12px;margin-top:28px}
+  .row{padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;cursor:pointer;color:var(--graphite);transition:background var(--duration) var(--ease-standard)}
+  .row:hover{background:var(--paper)}
+  .title{font-size:16px;font-weight:500}
+  .title span{color:var(--slate);font-weight:400}
+  .meta{font-size:13.5px;color:var(--slate);margin-top:3px}
+  .right{display:flex;align-items:center;gap:16px;flex:0 0 auto}
+  .score{font-size:28px;font-weight:500;min-width:40px;text-align:right}
+  .pill{display:inline-flex;align-items:center;height:22px;padding:0 10px;border-radius:999px;font-size:12.5px;font-weight:500;line-height:1;white-space:nowrap;background:var(--white);border:1px solid var(--hairline);color:var(--graphite)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;height:34px;padding:0 14px;border-radius:6px;border:1px solid transparent;font-size:14px;font-weight:500;cursor:pointer;transition:background var(--duration) var(--ease-standard)}
+  .btn:active{transform:translateY(1px)}
+  .btn.primary{background:var(--cobalt);color:#fff}
+  .btn.primary:hover{background:var(--cobalt-press)}
+  .btn.secondary{background:var(--paper);border-color:var(--hairline);color:var(--graphite)}
+  .btn.secondary:hover{background:var(--paper-hover)}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><img src="../assets/logo.png" alt="jobpilot"></div>
+    <nav class="nav">
+      <a class="navitem" href="index.html">Dashboard</a>
+      <a class="navitem active" href="jobs.html">Jobs</a>
+      <span class="navitem">Applications</span>
+      <a class="navitem" href="resume.html">Resume</a>
+      <span class="navitem">Career Profile</span>
+      <span class="navitem">Analytics</span>
+      <span class="navitem">Settings</span>
+    </nav>
+    <div class="side-foot">
+      <div class="email">chudler624@gmail.com</div>
+      <button class="btn secondary" style="margin-top:8px;width:100%;height:30px">Sign out</button>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="head">
+      <div>
+        <h1 class="page">Jobs</h1>
+        <p class="sub">Paste a job description to extract structured fields.</p>
+      </div>
+      <div class="actions">
+        <button class="btn secondary">Discover jobs</button>
+        <button class="btn primary">Analyze a job</button>
+      </div>
+    </div>
+    <div class="list">
+      <a class="panel row" href="index.html?screen=JobDetail">
+        <div>
+          <div class="title">FinTech Integration Engineer <span>· Successions</span></div>
+          <div class="meta">US · <span class="mono">$10 – $500,000</span></div>
+        </div>
+        <div class="right"><span class="pill">Onsite</span><span class="mono score">81</span></div>
+      </a>
+      <a class="panel row" href="index.html?screen=JobDetail">
+        <div>
+          <div class="title">Workflow Builder <span>· Nscale</span></div>
+          <div class="meta">Seattle, WA · <span class="mono">$180,000 – $250,000</span></div>
+        </div>
+        <div class="right"><span class="pill">Remote</span><span class="mono score">76</span></div>
+      </a>
+      <a class="panel row" href="index.html?screen=JobDetail">
+        <div>
+          <div class="title">AI Automation Engineer <span>· Acme Corp</span></div>
+          <div class="meta">Remote · <span class="mono">$130,000 – $160,000</span></div>
+        </div>
+        <div class="right"><span class="pill">Remote</span><span class="mono score">94</span></div>
+      </a>
+    </div>
+  </main>
+</div>
+</body>
+</html>

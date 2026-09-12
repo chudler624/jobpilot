@@ -8,16 +8,20 @@ export function GenerateResumeButton({
   action,
   label,
   pendingLabel,
+  variant = "default",
+  disabled = false,
 }: {
   action: (prevState: ActionState, formData: FormData) => Promise<ActionState>;
   label: string;
   pendingLabel?: string;
+  variant?: "default" | "outline";
+  disabled?: boolean;
 }) {
   const [state, formAction, isPending] = useActionState(action, {});
 
   return (
     <form action={formAction} className="flex flex-col items-start gap-2">
-      <Button type="submit" disabled={isPending}>
+      <Button type="submit" variant={variant} disabled={isPending || disabled}>
         {isPending ? (pendingLabel ?? "Generating...") : label}
       </Button>
       {state?.error && (

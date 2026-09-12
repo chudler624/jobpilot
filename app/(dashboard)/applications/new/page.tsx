@@ -23,8 +23,8 @@ export default async function NewApplicationPage() {
   return (
     <div className="max-w-2xl space-y-4">
       <div>
-        <h1 className="text-2xl font-semibold">Track a job</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-[26px] leading-tight font-medium">Track a job</h1>
+        <p className="mt-1 text-[15px] text-muted-foreground">
           Pick a job you&apos;ve already analyzed to start tracking it.
         </p>
       </div>

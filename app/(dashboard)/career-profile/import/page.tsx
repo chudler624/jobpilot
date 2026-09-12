@@ -77,8 +77,8 @@ export default function ImportPage() {
     return (
       <div className="max-w-2xl space-y-4">
         <div>
-          <h1 className="text-2xl font-semibold">Import from resume</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-[26px] leading-tight font-medium">Import from resume</h1>
+          <p className="mt-1 text-[15px] text-muted-foreground">
             Upload an existing resume (PDF or DOCX). The AI extracts a
             baseline Career Profile from it, which you review and edit below
             before anything is saved — nothing is written to your profile
@@ -111,8 +111,8 @@ export default function ImportPage() {
   return (
     <div className="max-w-3xl space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold">Review before saving</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-[26px] leading-tight font-medium">Review before saving</h1>
+        <p className="mt-1 text-[15px] text-muted-foreground">
           Uncheck anything you don&apos;t want, edit anything that&apos;s
           wrong, then save. Nothing has been added to your Career Profile
           yet.
@@ -120,7 +120,7 @@ export default function ImportPage() {
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-lg font-semibold">Experiences</h2>
+        <h2 className="text-lg font-medium">Experiences</h2>
         {experiences.map((experience, index) => (
           <Card key={index}>
             <CardHeader className="flex flex-row items-center gap-2">
@@ -319,7 +319,7 @@ export default function ImportPage() {
 
       {projects.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Projects</h2>
+          <h2 className="text-lg font-medium">Projects</h2>
           {projects.map((project, index) => (
             <Card key={index}>
               <CardHeader className="flex flex-row items-center gap-2">
@@ -404,7 +404,7 @@ export default function ImportPage() {
       )}
 
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold">Skills</h2>
+        <h2 className="text-lg font-medium">Skills</h2>
         <div className="flex flex-wrap gap-3">
           {skills.map((skill, index) => (
             <label

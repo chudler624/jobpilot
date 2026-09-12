@@ -26,7 +26,7 @@ export default async function EditApplicationPage({
 
   return (
     <div className="max-w-2xl space-y-6">
-      <h1 className="text-2xl font-semibold">Edit application</h1>
+      <h1 className="text-[26px] leading-tight font-medium">Edit application</h1>
       <EditApplicationForm
         application={application}
         resumeVersions={resumeVersions ?? []}

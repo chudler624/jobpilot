@@ -33,7 +33,7 @@ export default async function SkillsPage() {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {skills?.map((skill) => (
           <Link key={skill.id} href={`/career-profile/skills/${skill.id}`}>
-            <Card className="transition-colors hover:bg-muted/50">
+            <Card className="transition-colors hover:bg-secondary">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-sm">{skill.name}</CardTitle>
                 <Badge variant={STRENGTH_VARIANT[skill.evidence_strength]}>

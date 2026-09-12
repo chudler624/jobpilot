@@ -24,8 +24,8 @@ export default async function ApplicationsPage() {
     <div className="max-w-3xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Applications</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-[26px] leading-tight font-medium">Applications</h1>
+          <p className="mt-1 text-[15px] text-muted-foreground">
             Your job search pipeline, from discovered to offer.
           </p>
         </div>
@@ -46,7 +46,7 @@ export default async function ApplicationsPage() {
           if (group.length === 0) return null;
           return (
             <div key={status} className="space-y-2">
-              <h2 className="text-sm font-semibold text-muted-foreground">
+              <h2 className="text-sm font-medium text-muted-foreground">
                 {STATUS_LABELS[status]} ({group.length})
               </h2>
               <div className="grid gap-2">
@@ -54,7 +54,7 @@ export default async function ApplicationsPage() {
                   const job = jobLookup.get(application.job_id);
                   return (
                     <Link key={application.id} href={`/applications/${application.id}`}>
-                      <Card className="transition-colors hover:bg-muted/50">
+                      <Card className="transition-colors hover:bg-secondary">
                         <CardHeader className="flex flex-row items-center justify-between">
                           <div>
                             <CardTitle>
@@ -65,7 +65,7 @@ export default async function ApplicationsPage() {
                               Updated {new Date(application.status_updated_at).toLocaleDateString()}
                             </CardDescription>
                           </div>
-                          <Badge variant="secondary">{STATUS_LABELS[application.status]}</Badge>
+                          <Badge variant="ink">{STATUS_LABELS[application.status]}</Badge>
                         </CardHeader>
                       </Card>
                     </Link>

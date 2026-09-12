@@ -1,14 +1,25 @@
 import Link from "next/link";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { GenerateResumeButton } from "@/components/resume/generate-resume-button";
 import { createClient } from "@/lib/supabase/server";
 import { generateResume } from "./actions";
+
+function isoDate(value: string) {
+  return new Date(value).toISOString().slice(0, 10);
+}
+
+function StatusBadge({ status }: { status: "draft" | "finalized" }) {
+  return status === "finalized" ? (
+    <Badge variant="outline" marker="verified">
+      Finalized
+    </Badge>
+  ) : (
+    <Badge variant="secondary" marker="unverified">
+      Draft
+    </Badge>
+  );
+}
 
 export default async function ResumePage() {
   const supabase = await createClient();
@@ -28,76 +39,79 @@ export default async function ResumePage() {
   const tailored = allVersions.filter((v) => v.job_id !== null);
 
   return (
-    <div className="max-w-3xl space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold">Resume</h1>
-        <p className="text-muted-foreground">
-          A code-driven, ATS-safe resume generated from your Career Profile
-          — a general-purpose Master Resume, plus versions tailored to
-          specific jobs.
-        </p>
-      </div>
+    <div className="max-w-[820px]">
+      <h1 className="text-[26px] leading-tight font-medium">Resume</h1>
+      <p className="mt-1 text-[15px] text-muted-foreground">
+        A code-driven, ATS-safe resume generated from your Career Profile — a
+        general-purpose Master Resume, plus versions tailored to specific jobs.
+      </p>
 
-      <div className="space-y-3">
-        <h2 className="text-lg font-semibold">Master Resume</h2>
+      <h2 className="mt-9 mb-3 text-base font-medium">Master Resume</h2>
+      <div className="flex flex-col gap-3">
         {master ? (
           <Link href={`/resume/${master.id}`}>
-            <Card className="transition-colors hover:bg-muted/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  {master.label} (v{master.version_number})
-                  <Badge variant={master.status === "finalized" ? "secondary" : "outline"}>
-                    {master.status === "finalized" ? "Finalized" : "Draft"}
-                  </Badge>
-                </CardTitle>
-                <CardDescription>
-                  Generated {new Date(master.created_at).toLocaleDateString()}
-                </CardDescription>
-              </CardHeader>
+            <Card className="flex-row items-center justify-between gap-4 px-[18px] transition-colors hover:bg-secondary">
+              <div className="min-w-0">
+                <div className="text-base font-medium">
+                  {master.label}
+                  <span className="font-normal text-muted-foreground">
+                    {" "}
+                    · v{master.version_number}
+                  </span>
+                </div>
+                <div className="mt-[3px] text-[13.5px] text-muted-foreground">
+                  Generated{" "}
+                  <span className="font-mono tabular">
+                    {isoDate(master.created_at)}
+                  </span>
+                </div>
+              </div>
+              <StatusBadge status={master.status} />
             </Card>
           </Link>
         ) : (
-          <p className="text-sm text-muted-foreground">
-            No Master Resume yet.
-          </p>
+          <p className="text-sm text-muted-foreground">No Master Resume yet.</p>
         )}
-        <GenerateResumeButton
-          action={generateResume.bind(null, null)}
-          label={master ? "Regenerate Master Resume" : "Generate Master Resume"}
-        />
+        <div>
+          <GenerateResumeButton
+            action={generateResume.bind(null, null)}
+            label={master ? "Regenerate Master Resume" : "Generate Master Resume"}
+            variant="outline"
+          />
+        </div>
       </div>
 
-      <div className="space-y-3">
-        <h2 className="text-lg font-semibold">Tailored versions</h2>
+      <h2 className="mt-9 mb-3 text-base font-medium">Tailored versions</h2>
+      <div className="flex flex-col gap-3">
         {tailored.length === 0 && (
           <p className="text-sm text-muted-foreground">
             None yet — generate one from a job&apos;s detail page.
           </p>
         )}
-        <div className="grid gap-3">
-          {tailored.map((version) => {
-            const job = version.job_id ? jobLookup.get(version.job_id) : null;
-            return (
-              <Link key={version.id} href={`/resume/${version.id}`}>
-                <Card className="transition-colors hover:bg-muted/50">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      {version.label} (v{version.version_number})
-                      <Badge variant={version.status === "finalized" ? "secondary" : "outline"}>
-                        {version.status === "finalized" ? "Finalized" : "Draft"}
-                      </Badge>
-                    </CardTitle>
-                    <CardDescription>
-                      {job
-                        ? `${job.title ?? "Untitled role"} at ${job.company ?? "Unknown company"}`
-                        : "Job no longer exists"}
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
-              </Link>
-            );
-          })}
-        </div>
+        {tailored.map((version) => {
+          const job = version.job_id ? jobLookup.get(version.job_id) : null;
+          return (
+            <Link key={version.id} href={`/resume/${version.id}`}>
+              <Card className="flex-row items-center justify-between gap-4 px-[18px] transition-colors hover:bg-secondary">
+                <div className="min-w-0">
+                  <div className="text-base font-medium">
+                    {version.label}
+                    <span className="font-normal text-muted-foreground">
+                      {" "}
+                      · v{version.version_number}
+                    </span>
+                  </div>
+                  <div className="mt-[3px] text-[13.5px] text-muted-foreground">
+                    {job
+                      ? `${job.title ?? "Untitled role"} at ${job.company ?? "Unknown company"}`
+                      : "Job no longer exists"}
+                  </div>
+                </div>
+                <StatusBadge status={version.status} />
+              </Card>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

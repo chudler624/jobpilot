@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { MainNav } from "@/components/nav/main-nav";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
@@ -15,10 +16,19 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-full flex-1">
-      <aside className="flex w-56 shrink-0 flex-col border-r">
-        <div className="px-4 py-4 text-lg font-semibold">jobpilot</div>
+      <aside className="sticky top-0 flex h-screen w-56 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
+        <div className="px-5 pt-5 pb-4">
+          <Image
+            src="/logo.png"
+            alt="jobpilot"
+            width={64}
+            height={24}
+            priority
+            className="h-6 w-auto"
+          />
+        </div>
         <MainNav />
-        <div className="mt-auto border-t p-4">
+        <div className="mt-auto border-t border-border p-4">
           <p className="truncate text-xs text-muted-foreground">
             {user?.email}
           </p>
@@ -29,7 +39,9 @@ export default async function DashboardLayout({
           </form>
         </div>
       </aside>
-      <main className="flex-1 p-8">{children}</main>
+      <main className="min-w-0 flex-1 px-12 py-10">
+        <div className="max-w-[1000px]">{children}</div>
+      </main>
     </div>
   );
 }

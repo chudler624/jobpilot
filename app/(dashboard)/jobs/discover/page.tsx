@@ -58,8 +58,8 @@ export default async function DiscoverPage() {
   return (
     <div className="max-w-3xl space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold">Discover jobs</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-[26px] leading-tight font-medium">Discover jobs</h1>
+        <p className="mt-1 text-[15px] text-muted-foreground">
           Pull open jobs from companies you watch on Greenhouse, instead of pasting one at a time.
         </p>
       </div>

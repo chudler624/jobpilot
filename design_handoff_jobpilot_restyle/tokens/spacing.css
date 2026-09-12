@@ -1,0 +1,36 @@
+/* jobpilot spacing, radius, borders.
+   Whitespace is the primary material. Flat panels, hairline borders, zero shadow. */
+:root {
+  /* 4px base spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Radius — 6px on panels; full pill for status tags so shape signals "state" */
+  --radius-panel: 6px;
+  --radius-control: 6px;
+  --radius-pill: 999px;
+
+  /* Borders — 1px hairline only where a boundary is real */
+  --border-width: 1px;
+  --border: var(--border-width) solid var(--hairline);
+
+  /* Shadows — there are none. This token exists to make that explicit. */
+  --shadow-none: none;
+
+  /* Layout */
+  --sidebar-width: 224px;
+  --content-max: 960px;
+
+  /* Motion — only in response to a user action, to show what changed */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1); /* @kind other */
+  --duration-fast: 120ms; /* @kind other */
+  --duration: 180ms; /* @kind other */
+}

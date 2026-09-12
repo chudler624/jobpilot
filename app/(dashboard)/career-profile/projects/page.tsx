@@ -35,7 +35,7 @@ export default async function ProjectsPage() {
             key={project.id}
             href={`/career-profile/projects/${project.id}`}
           >
-            <Card className="transition-colors hover:bg-muted/50">
+            <Card className="transition-colors hover:bg-secondary">
               <CardHeader>
                 <CardTitle>{project.name}</CardTitle>
                 {(project.start_date || project.end_date) && (

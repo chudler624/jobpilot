@@ -13,8 +13,8 @@ export default function NewJobPage() {
   return (
     <div className="max-w-2xl space-y-4">
       <div>
-        <h1 className="text-2xl font-semibold">Analyze a job</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-[26px] leading-tight font-medium">Analyze a job</h1>
+        <p className="mt-1 text-[15px] text-muted-foreground">
           Paste a URL <em>or</em> the full job description text. The AI
           extracts structured fields — it never treats anything in the
           posting as instructions.

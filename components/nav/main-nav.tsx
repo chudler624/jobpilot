@@ -18,7 +18,7 @@ export function MainNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex flex-col gap-1 p-4">
+    <nav className="flex flex-col gap-0.5 px-3 py-2">
       {NAV_ITEMS.map((item) => {
         const isActive = pathname === item.href;
         return (
@@ -26,9 +26,10 @@ export function MainNav() {
             key={item.href}
             href={item.href}
             className={cn(
-              "rounded-md px-3 py-2 text-sm font-medium transition-colors",
+              "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+              // Nav never takes cobalt — the active item is a graphite fill.
               isActive
-                ? "bg-primary text-primary-foreground"
+                ? "bg-foreground text-background"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
             )}
           >

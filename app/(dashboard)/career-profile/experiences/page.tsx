@@ -38,7 +38,7 @@ export default async function ExperiencesPage() {
             key={experience.id}
             href={`/career-profile/experiences/${experience.id}`}
           >
-            <Card className="transition-colors hover:bg-muted/50">
+            <Card className="transition-colors hover:bg-secondary">
               <CardHeader>
                 <CardTitle>
                   {experience.title} · {experience.company}

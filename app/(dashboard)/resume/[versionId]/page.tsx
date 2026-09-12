@@ -81,12 +81,18 @@ export default async function ResumeVersionPage({
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-semibold">{version.label}</h1>
-            <Badge variant={version.status === "finalized" ? "secondary" : "outline"}>
-              {version.status === "finalized" ? "Finalized" : "Draft"}
-            </Badge>
+            <h1 className="text-[26px] leading-tight font-medium">{version.label}</h1>
+            {version.status === "finalized" ? (
+              <Badge variant="outline" marker="verified">
+                Finalized
+              </Badge>
+            ) : (
+              <Badge variant="secondary" marker="unverified">
+                Draft
+              </Badge>
+            )}
           </div>
-          <p className="text-muted-foreground">
+          <p className="mt-1 text-[15px] text-muted-foreground">
             v{version.version_number}
             {job
               ? ` · ${job.title ?? "Untitled role"} at ${job.company ?? "Unknown company"}`

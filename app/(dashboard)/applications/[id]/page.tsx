@@ -86,11 +86,11 @@ export default async function ApplicationDetailPage({
     <div className="max-w-2xl space-y-8">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">
+          <h1 className="text-[26px] leading-tight font-medium">
             {job?.title ?? "Untitled role"}
             {job?.company ? ` · ${job.company}` : ""}
           </h1>
-          <p className="text-muted-foreground">
+          <p className="mt-1 text-[15px] text-muted-foreground">
             {job?.location ?? "Location unknown"}
             {score && (
               <>

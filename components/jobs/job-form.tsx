@@ -110,7 +110,7 @@ export function JobForm({
         {state?.error && (
           <p className="text-sm text-destructive">{state.error}</p>
         )}
-        <Button type="submit" className="self-start">
+        <Button type="submit" variant="outline" className="self-start">
           Save changes
         </Button>
       </form>

@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { VerifiedMarker } from "@/components/ui/verified-marker";
 import { VerifyCheckbox } from "@/components/resume/verify-checkbox";
 import { GenerateResumeButton } from "@/components/resume/generate-resume-button";
 import { createClient } from "@/lib/supabase/server";
@@ -28,29 +29,52 @@ function ClaimRow({
   profile: CareerProfileLookup;
 }) {
   const citation = resolveCitation(section, profile);
+  const wellEvidenced = citation.confidence === "well-evidenced";
   return (
-    <li className="space-y-2 rounded-md border p-3 text-sm">
-      <p>{section.content_text}</p>
-      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-        <span>Backed by: {citation.label}</span>
-        <Badge variant={citation.confidence === "well-evidenced" ? "secondary" : "outline"}>
-          {citation.confidence === "well-evidenced" ? "Well-evidenced" : "Thin evidence"}
-        </Badge>
-      </div>
-      {citation.detail.length > 0 && (
-        <div className="space-y-1 rounded-md bg-muted/50 p-2 text-xs">
-          {citation.detail.map((d) => (
-            <p key={d.heading}>
-              <span className="font-medium">{d.heading}:</span> {d.body}
-            </p>
-          ))}
+    <li className="flex gap-3 border-b border-border py-3 last:border-b-0">
+      <VerifiedMarker verified={section.user_verified} className="mt-1.5" />
+      <div className="min-w-0 flex-1">
+        <p
+          className={
+            section.user_verified
+              ? "text-[14.5px] leading-normal"
+              : "text-[14.5px] leading-normal text-muted-foreground"
+          }
+        >
+          {section.content_text}
+        </p>
+
+        <div className="mt-2 flex flex-wrap items-center gap-4">
+          <details className="group/ev">
+            <summary className="cursor-pointer list-none text-[13px] text-primary [&::-webkit-details-marker]:hidden">
+              <span className="group-open/ev:hidden">Why is this here?</span>
+              <span className="hidden group-open/ev:inline">Hide evidence</span>
+            </summary>
+            <div className="mt-2.5 rounded-lg border border-border bg-secondary px-3.5 py-3 text-[13.5px] leading-[1.55]">
+              <p className="flex flex-wrap items-center gap-2">
+                <span>Backed by: {citation.label}</span>
+                <Badge
+                  variant={wellEvidenced ? "outline" : "secondary"}
+                  marker={wellEvidenced ? "verified" : "unverified"}
+                >
+                  {wellEvidenced ? "Well-evidenced" : "Thin evidence"}
+                </Badge>
+              </p>
+              {citation.detail.map((d) => (
+                <p key={d.heading} className="mt-1.5">
+                  <span className="font-medium">{d.heading}:</span> {d.body}
+                </p>
+              ))}
+            </div>
+          </details>
+
+          <VerifyCheckbox
+            sectionId={section.id}
+            versionId={versionId}
+            initialVerified={section.user_verified}
+          />
         </div>
-      )}
-      <VerifyCheckbox
-        sectionId={section.id}
-        versionId={versionId}
-        initialVerified={section.user_verified}
-      />
+      </div>
     </li>
   );
 }
@@ -118,19 +142,61 @@ export default async function ResumeReviewPage({
   );
   const unrepresentedSkills = (skills ?? []).filter((s) => !citedSkillIds.has(s.id));
 
+  const allVerified = total > 0 && verifiedCount === total;
+
   return (
-    <div className="max-w-2xl space-y-6">
-      <div className="flex items-start justify-between gap-4">
+    <div className="max-w-[820px] space-y-4">
+      <div className="flex items-start justify-between gap-6">
         <div>
-          <h1 className="text-2xl font-semibold">Review — {version.label}</h1>
-          <p className="text-muted-foreground">
-            v{version.version_number} · {verifiedCount} of {total} claims verified
+          <h1 className="text-[26px] leading-tight font-medium">
+            Review — {version.label}
+          </h1>
+          <p className="mt-1 text-[15px] text-muted-foreground">
+            v{version.version_number} · every claim traces to real evidence
+            before you finalize.
           </p>
         </div>
-        <Link href={`/resume/${version.id}`} className={buttonVariants({ variant: "outline" })}>
+        <Link
+          href={`/resume/${version.id}`}
+          className={buttonVariants({ variant: "outline" })}
+        >
           Back to resume
         </Link>
       </div>
+
+      <Card className="mt-7 flex-row items-center justify-between gap-4 px-[18px] py-3.5">
+        <span className="text-sm text-muted-foreground">
+          <span className="font-mono font-medium text-foreground tabular">
+            {verifiedCount}
+          </span>{" "}
+          of{" "}
+          <span className="font-mono font-medium text-foreground tabular">
+            {total}
+          </span>{" "}
+          claims verified
+        </span>
+        <div className="flex shrink-0 items-center gap-3">
+          {version.status === "finalized" ? (
+            <Badge variant="outline" marker="verified">
+              Finalized
+            </Badge>
+          ) : (
+            <>
+              {!allVerified && (
+                <span className="text-[13px] text-muted-foreground">
+                  Finalize is blocked until every claim is checked.
+                </span>
+              )}
+              <GenerateResumeButton
+                action={finalizeResumeVersion.bind(null, version.id)}
+                label="Finalize"
+                pendingLabel="Finalizing..."
+                disabled={!allVerified}
+              />
+            </>
+          )}
+        </div>
+      </Card>
 
       <div className="space-y-4">
         {summaryClaims.length > 0 && (
@@ -139,7 +205,7 @@ export default async function ResumeReviewPage({
               <CardTitle>Summary</CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2">
+              <ul>
                 {summaryClaims.map((s) => (
                   <ClaimRow key={s.id} section={s} versionId={version.id} profile={profile} />
                 ))}
@@ -154,7 +220,7 @@ export default async function ResumeReviewPage({
               <CardTitle>Skills</CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2">
+              <ul>
                 {skillSections.map((s) => (
                   <ClaimRow key={s.id} section={s} versionId={version.id} profile={profile} />
                 ))}
@@ -169,7 +235,7 @@ export default async function ResumeReviewPage({
               <CardTitle className="text-base">{group.header.content_text}</CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2">
+              <ul>
                 <ClaimRow section={group.header} versionId={version.id} profile={profile} />
                 {group.bullets.map((b) => (
                   <ClaimRow key={b.id} section={b} versionId={version.id} profile={profile} />
@@ -185,7 +251,7 @@ export default async function ResumeReviewPage({
               <CardTitle className="text-base">{group.header.content_text}</CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2">
+              <ul>
                 <ClaimRow section={group.header} versionId={version.id} profile={profile} />
                 {group.bullets.map((b) => (
                   <ClaimRow key={b.id} section={b} versionId={version.id} profile={profile} />
@@ -220,20 +286,14 @@ export default async function ResumeReviewPage({
         </CardContent>
       </Card>
 
-      {version.status === "finalized" ? (
-        <p className="text-sm text-muted-foreground">
-          This resume version is finalized
-          {version.finalized_at
-            ? ` (${new Date(version.finalized_at).toLocaleDateString()})`
-            : ""}
+      {version.status === "finalized" && version.finalized_at && (
+        <p className="text-[13px] text-muted-foreground">
+          Finalized{" "}
+          <span className="font-mono tabular">
+            {new Date(version.finalized_at).toISOString().slice(0, 10)}
+          </span>
           .
         </p>
-      ) : (
-        <GenerateResumeButton
-          action={finalizeResumeVersion.bind(null, version.id)}
-          label="Finalize this resume"
-          pendingLabel="Finalizing..."
-        />
       )}
     </div>
   );

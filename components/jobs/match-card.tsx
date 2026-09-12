@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { VerifiedMarker } from "@/components/ui/verified-marker";
 import type { ActionState } from "@/lib/career-profile/schemas";
 import type { Database } from "@/types/supabase";
 
@@ -23,11 +24,13 @@ const RECOMMENDATION_LABELS = {
   skip: "Skip",
 } as const;
 
+// Cobalt fill is earned: only "Apply" gets it. Skip is muted, never red —
+// a skip is an ordinary outcome, not an alarm.
 const RECOMMENDATION_VARIANT = {
   apply: "default",
-  apply_stretch: "secondary",
+  apply_stretch: "outline",
   maybe: "outline",
-  skip: "destructive",
+  skip: "secondary",
 } as const;
 
 const DIMENSION_LABELS: { key: keyof JobScore; label: string }[] = [
@@ -74,18 +77,24 @@ function MatchGroup({
 }) {
   if (matches.length === 0) return null;
   return (
-    <div className="space-y-2">
-      <h4 className="text-sm font-medium">{title}</h4>
-      <ul className="space-y-2">
+    <div>
+      <h4 className="mb-2 text-[13px] font-medium">{title}</h4>
+      <ul className="flex flex-col gap-2">
         {matches.map((match) => (
-          <li key={match.id} className="rounded-md border p-2.5 text-sm">
+          <li
+            key={match.id}
+            className="rounded-lg border border-border px-3.5 py-3"
+          >
             <div className="flex items-start justify-between gap-2">
-              <span className="font-medium">{match.requirement_text}</span>
+              <span className="text-sm font-medium">{match.requirement_text}</span>
               <Badge variant={STATUS_VARIANT[match.status]}>{match.status}</Badge>
             </div>
-            <p className="mt-1 text-muted-foreground">{match.rationale}</p>
+            <p className="mt-1 text-[13.5px] leading-[1.5] text-muted-foreground">
+              {match.rationale}
+            </p>
             {citationLabel(match, labels) && (
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="mt-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
+                <VerifiedMarker verified className="size-[7px]" />
                 Backed by: {citationLabel(match, labels)}
               </p>
             )}
@@ -115,20 +124,21 @@ export function MatchCard({
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
+      <CardHeader className="flex flex-row items-start justify-between gap-6">
+        <div className="max-w-[60ch]">
           <CardTitle>Match</CardTitle>
-          <CardDescription>
+          <CardDescription className="text-[14.5px] leading-[1.55]">
             How this job stacks up against your Career Profile.
           </CardDescription>
         </div>
         {score && (
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-4">
             <div className="text-right">
-              <div className="text-2xl font-semibold leading-none">
-                {formatPercent(score.overall_score)}
+              <div className="font-mono text-[40px] leading-none font-medium tabular">
+                {Math.round(score.overall_score * 100)}
+                <span className="text-xl text-muted-foreground">%</span>
               </div>
-              <div className="text-xs text-muted-foreground">
+              <div className="mt-1 text-xs text-muted-foreground">
                 overall (weighted)
               </div>
             </div>
@@ -139,22 +149,6 @@ export function MatchCard({
         )}
       </CardHeader>
       <CardContent className="space-y-4">
-        {score && (
-          <div className="space-y-1.5">
-            <h4 className="text-sm font-medium">Breakdown</h4>
-            <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-sm sm:grid-cols-3">
-              {DIMENSION_LABELS.map(({ key, label }) => (
-                <div key={key} className="flex justify-between gap-2">
-                  <span className="text-muted-foreground">{label}</span>
-                  <span className="font-medium">
-                    {formatPercent(score[key] as number | null)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {state?.error && (
           <p className="text-sm text-destructive">{state.error}</p>
         )}
@@ -170,16 +164,52 @@ export function MatchCard({
         </form>
 
         {score && matches.length > 0 && (
-          <details className="space-y-3">
-            <summary className="cursor-pointer text-sm font-medium">
-              Why you match
-            </summary>
-            <div className="mt-3 space-y-4">
-              <MatchGroup title="Strong" matches={strong} labels={citationLabels} />
-              <MatchGroup title="Partial" matches={partial} labels={citationLabels} />
-              <MatchGroup title="Missing" matches={missing} labels={citationLabels} />
-            </div>
-          </details>
+          <>
+            <hr className="border-border" />
+            <details className="group">
+              <summary className="cursor-pointer list-none text-sm font-medium text-primary [&::-webkit-details-marker]:hidden">
+                <span className="group-open:hidden">View breakdown</span>
+                <span className="hidden group-open:inline">Hide breakdown</span>
+              </summary>
+
+              <div className="mt-[18px]">
+                <h4 className="mb-2 text-[13px] font-medium">Breakdown</h4>
+                <div className="grid grid-cols-2 gap-x-8 sm:grid-cols-3">
+                  {DIMENSION_LABELS.map(({ key, label }) => (
+                    <div
+                      key={key}
+                      className="flex items-baseline justify-between border-b border-border py-[9px]"
+                    >
+                      <span className="text-[13.5px] text-muted-foreground">
+                        {label}
+                      </span>
+                      <span className="font-mono text-sm font-medium tabular">
+                        {formatPercent(score[key] as number | null)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-6 flex flex-col gap-[18px]">
+                  <MatchGroup
+                    title="Strong"
+                    matches={strong}
+                    labels={citationLabels}
+                  />
+                  <MatchGroup
+                    title="Partial"
+                    matches={partial}
+                    labels={citationLabels}
+                  />
+                  <MatchGroup
+                    title="Missing"
+                    matches={missing}
+                    labels={citationLabels}
+                  />
+                </div>
+              </div>
+            </details>
+          </>
         )}
       </CardContent>
     </Card>

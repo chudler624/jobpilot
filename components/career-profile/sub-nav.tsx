@@ -15,7 +15,7 @@ export function CareerProfileSubNav() {
   const pathname = usePathname();
 
   return (
-    <div className="flex gap-1 border-b pb-2">
+    <div className="flex flex-wrap gap-1 border-b pb-2">
       {TABS.map((tab) => {
         const isActive = pathname.startsWith(tab.href);
         return (
@@ -23,9 +23,10 @@ export function CareerProfileSubNav() {
             key={tab.href}
             href={tab.href}
             className={cn(
-              "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+              "rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
+              // Nav never takes cobalt — active is a graphite fill.
               isActive
-                ? "bg-primary text-primary-foreground"
+                ? "bg-foreground text-background"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
             )}
           >

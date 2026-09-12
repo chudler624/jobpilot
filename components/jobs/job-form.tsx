@@ -38,7 +38,7 @@ export function JobForm({
   return (
     <div className="space-y-6">
       <form action={formAction} className="flex flex-col gap-4">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="company">Company</Label>
             <Input id="company" name="company" defaultValue={job.company ?? ""} />
@@ -48,7 +48,7 @@ export function JobForm({
             <Input id="title" name="title" defaultValue={job.title ?? ""} />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="location">Location</Label>
             <Input
@@ -78,7 +78,7 @@ export function JobForm({
             </Select>
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-1.5">
             <Label htmlFor="salary_min">Salary min</Label>
             <Input

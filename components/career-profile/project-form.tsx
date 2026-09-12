@@ -39,7 +39,7 @@ export function ProjectForm({
             defaultValue={project?.url ?? ""}
           />
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="start_date">Start date</Label>
             <Input

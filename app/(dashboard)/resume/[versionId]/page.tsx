@@ -78,7 +78,7 @@ export default async function ResumeVersionPage({
 
   return (
     <div className="max-w-2xl space-y-6">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-[26px] leading-tight font-medium">{version.label}</h1>

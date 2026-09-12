@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { MainNav } from "@/components/nav/main-nav";
+import { MobileNav } from "@/components/nav/mobile-nav";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "./actions";
@@ -15,8 +16,16 @@ export default async function DashboardLayout({
   } = await supabase.auth.getUser();
 
   return (
-    <div className="flex min-h-full flex-1">
-      <aside className="sticky top-0 flex h-screen w-56 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
+    <div className="flex min-h-full flex-1 flex-col lg:flex-row">
+      <MobileNav email={user?.email}>
+        <form action={signOut}>
+          <Button variant="outline" size="sm" className="w-full">
+            Sign out
+          </Button>
+        </form>
+      </MobileNav>
+
+      <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-sidebar-border bg-sidebar lg:flex">
         <div className="px-5 pt-5 pb-4">
           <Image
             src="/logo.png"
@@ -39,7 +48,7 @@ export default async function DashboardLayout({
           </form>
         </div>
       </aside>
-      <main className="min-w-0 flex-1 px-12 py-10">
+      <main className="min-w-0 flex-1 px-5 py-7 sm:px-8 lg:px-12 lg:py-10">
         <div className="max-w-[1000px]">{children}</div>
       </main>
     </div>

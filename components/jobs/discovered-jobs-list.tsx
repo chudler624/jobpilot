@@ -63,7 +63,7 @@ export function DiscoveredJobsList({ jobs }: { jobs: DiscoveredJob[] }) {
             type="number"
             value={minSalary}
             onChange={(e) => setMinSalary(e.target.value)}
-            className="w-32"
+            className="w-full sm:w-32"
           />
         </div>
         <div className="space-y-1">
@@ -73,14 +73,14 @@ export function DiscoveredJobsList({ jobs }: { jobs: DiscoveredJob[] }) {
             type="number"
             value={maxYears}
             onChange={(e) => setMaxYears(e.target.value)}
-            className="w-32"
+            className="w-full sm:w-32"
           />
         </div>
       </div>
 
       <ul className="space-y-2">
         {filtered.map((job) => (
-          <li key={job.id} className="flex items-center justify-between gap-3 rounded-md border p-3 text-sm">
+          <li key={job.id} className="flex flex-wrap items-center justify-between gap-3 rounded-md border p-3 text-sm">
             <div>
               <Link href={`/jobs/${job.id}`} className="font-medium hover:underline">
                 {job.title ?? "Untitled role"}

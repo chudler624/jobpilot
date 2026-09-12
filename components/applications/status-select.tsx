@@ -25,7 +25,7 @@ export function StatusSelect({
   return (
     <form action={formAction} className="flex flex-wrap items-center gap-2">
       <Select name="status" defaultValue={currentStatus} items={STATUS_LABELS}>
-        <SelectTrigger className="w-48">
+        <SelectTrigger className="w-full sm:w-48">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

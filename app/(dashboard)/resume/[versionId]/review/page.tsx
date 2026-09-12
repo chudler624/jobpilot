@@ -146,7 +146,7 @@ export default async function ResumeReviewPage({
 
   return (
     <div className="max-w-[820px] space-y-4">
-      <div className="flex items-start justify-between gap-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
         <div>
           <h1 className="text-[26px] leading-tight font-medium">
             Review — {version.label}
@@ -164,7 +164,7 @@ export default async function ResumeReviewPage({
         </Link>
       </div>
 
-      <Card className="mt-7 flex-row items-center justify-between gap-4 px-[18px] py-3.5">
+      <Card className="mt-7 items-start gap-3 px-[18px] py-3.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <span className="text-sm text-muted-foreground">
           <span className="font-mono font-medium text-foreground tabular">
             {verifiedCount}
@@ -175,7 +175,7 @@ export default async function ResumeReviewPage({
           </span>{" "}
           claims verified
         </span>
-        <div className="flex shrink-0 items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           {version.status === "finalized" ? (
             <Badge variant="outline" marker="verified">
               Finalized
@@ -274,7 +274,7 @@ export default async function ResumeReviewPage({
           ) : (
             <ul className="space-y-1 text-sm">
               {unrepresentedSkills.map((s) => (
-                <li key={s.id} className="flex items-center justify-between gap-2">
+                <li key={s.id} className="flex flex-wrap items-center justify-between gap-2">
                   <span>{s.name}</span>
                   <span className="text-xs text-muted-foreground">
                     You have this — evidence: {s.evidence_strength}

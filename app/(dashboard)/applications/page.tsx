@@ -22,7 +22,7 @@ export default async function ApplicationsPage() {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-[26px] leading-tight font-medium">Applications</h1>
           <p className="mt-1 text-[15px] text-muted-foreground">
@@ -55,7 +55,7 @@ export default async function ApplicationsPage() {
                   return (
                     <Link key={application.id} href={`/applications/${application.id}`}>
                       <Card className="transition-colors hover:bg-secondary">
-                        <CardHeader className="flex flex-row items-center justify-between">
+                        <CardHeader className="flex flex-row items-center justify-between gap-3">
                           <div>
                             <CardTitle>
                               {job?.title ?? "Untitled role"}

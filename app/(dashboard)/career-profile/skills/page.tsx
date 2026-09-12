@@ -34,7 +34,7 @@ export default async function SkillsPage() {
         {skills?.map((skill) => (
           <Link key={skill.id} href={`/career-profile/skills/${skill.id}`}>
             <Card className="transition-colors hover:bg-secondary">
-              <CardHeader className="flex flex-row items-center justify-between">
+              <CardHeader className="flex flex-row items-center justify-between gap-3">
                 <CardTitle className="text-sm">{skill.name}</CardTitle>
                 <Badge variant={STRENGTH_VARIANT[skill.evidence_strength]}>
                   {skill.evidence_strength}

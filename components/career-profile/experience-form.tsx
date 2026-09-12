@@ -25,7 +25,7 @@ export function ExperienceForm({
   return (
     <div className="space-y-6">
       <form action={formAction} className="flex flex-col gap-4">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="company">Company</Label>
             <Input
@@ -53,7 +53,7 @@ export function ExperienceForm({
             defaultValue={experience?.location ?? ""}
           />
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="start_date">Start date</Label>
             <Input

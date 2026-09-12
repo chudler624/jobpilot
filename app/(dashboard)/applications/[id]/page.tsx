@@ -84,7 +84,7 @@ export default async function ApplicationDetailPage({
 
   return (
     <div className="max-w-2xl space-y-8">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-[26px] leading-tight font-medium">
             {job?.title ?? "Untitled role"}
@@ -191,7 +191,7 @@ export default async function ApplicationDetailPage({
           {contactList.length > 0 && (
             <ul className="space-y-2 text-sm">
               {contactList.map((c) => (
-                <li key={c.id} className="flex items-center justify-between gap-2 rounded-md border p-2">
+                <li key={c.id} className="flex flex-wrap items-center justify-between gap-2 rounded-md border p-2">
                   <div>
                     <p className="font-medium">
                       {c.name}

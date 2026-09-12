@@ -50,7 +50,7 @@ export default async function ResumePage() {
       <div className="flex flex-col gap-3">
         {master ? (
           <Link href={`/resume/${master.id}`}>
-            <Card className="flex-row items-center justify-between gap-4 px-[18px] transition-colors hover:bg-secondary">
+            <Card className="items-start gap-3 px-[18px] sm:flex-row sm:items-center sm:justify-between sm:gap-4 transition-colors hover:bg-secondary">
               <div className="min-w-0">
                 <div className="text-base font-medium">
                   {master.label}
@@ -92,7 +92,7 @@ export default async function ResumePage() {
           const job = version.job_id ? jobLookup.get(version.job_id) : null;
           return (
             <Link key={version.id} href={`/resume/${version.id}`}>
-              <Card className="flex-row items-center justify-between gap-4 px-[18px] transition-colors hover:bg-secondary">
+              <Card className="items-start gap-3 px-[18px] sm:flex-row sm:items-center sm:justify-between sm:gap-4 transition-colors hover:bg-secondary">
                 <div className="min-w-0">
                   <div className="text-base font-medium">
                     {version.label}

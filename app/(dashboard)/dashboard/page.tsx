@@ -58,7 +58,7 @@ export default async function DashboardPage() {
         A live snapshot of your job search.
       </p>
 
-      <div className="mt-7 grid grid-cols-5 gap-3">
+      <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {CARDS.map((card) => (
           <Link key={card.key} href={card.href}>
             <Card className="gap-0 px-4 py-[18px]">
@@ -84,7 +84,7 @@ export default async function DashboardPage() {
               if (!job) return null;
               return (
                 <Link key={score.job_id} href={`/jobs/${score.job_id}`}>
-                  <Card className="flex-row items-center justify-between gap-4 px-[18px] transition-colors hover:bg-secondary">
+                  <Card className="items-start gap-3 px-[18px] sm:flex-row sm:items-center sm:justify-between sm:gap-4 transition-colors hover:bg-secondary">
                     <div className="min-w-0">
                       <div className="text-base font-medium">
                         {job.title ?? "Untitled role"}

@@ -124,7 +124,7 @@ export function MatchCard({
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-start justify-between gap-6">
+      <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
         <div className="max-w-[60ch]">
           <CardTitle>Match</CardTitle>
           <CardDescription className="text-[14.5px] leading-[1.55]">
@@ -174,7 +174,7 @@ export function MatchCard({
 
               <div className="mt-[18px]">
                 <h4 className="mb-2 text-[13px] font-medium">Breakdown</h4>
-                <div className="grid grid-cols-2 gap-x-8 sm:grid-cols-3">
+                <div className="grid gap-x-8 sm:grid-cols-2 lg:grid-cols-3">
                   {DIMENSION_LABELS.map(({ key, label }) => (
                     <div
                       key={key}

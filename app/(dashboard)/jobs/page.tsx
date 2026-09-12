@@ -28,7 +28,7 @@ export default async function JobsPage() {
 
   return (
     <div>
-      <div className="flex items-start justify-between gap-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
         <div>
           <h1 className="text-[26px] leading-tight font-medium">Jobs</h1>
           <p className="mt-1 text-[15px] text-muted-foreground">
@@ -61,7 +61,7 @@ export default async function JobsPage() {
           const score = scoreByJob.get(job.id);
           return (
             <Link key={job.id} href={`/jobs/${job.id}`}>
-              <Card className="flex-row items-center justify-between gap-4 px-[18px] transition-colors hover:bg-secondary">
+              <Card className="items-start gap-3 px-[18px] sm:flex-row sm:items-center sm:justify-between sm:gap-4 transition-colors hover:bg-secondary">
                 <div className="min-w-0">
                   <div className="text-base font-medium">
                     {job.title ?? "Untitled role"}

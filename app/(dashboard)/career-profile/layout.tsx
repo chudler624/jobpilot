@@ -9,7 +9,7 @@ export default function CareerProfileLayout({
 }) {
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-[26px] leading-tight font-medium">Career Profile</h1>
           <p className="mt-1 text-[15px] text-muted-foreground">

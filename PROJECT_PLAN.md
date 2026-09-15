@@ -458,6 +458,13 @@ directly addressing the "too narrow" feedback on Phase 7's original build.
   pastes the real posting and requirements are re-extracted from it (old
   score cleared). Deliberately not a smarter server-side fetch: the
   blocked `land/ad` URLs are bot protection, not a bug to route around
+- **Amended again (ADR-020):** capture is now zero-click when the Phase 8
+  extension is installed and signed in — clicking "View original listing"
+  on a snippet-only job lets the extension read the posting in the user's
+  own browser, save it, and send the JobPilot tab back to auto-extract.
+  Widens the extension's permissions and gives it write access to jobs
+  (amends ADR-015). Not yet verified in a real browser; the paste box
+  remains the fallback
 
 ### Database
 - `jobs.external_id` (nullable text), `jobs.is_snippet_only` (boolean)

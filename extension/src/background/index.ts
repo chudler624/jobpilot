@@ -1,6 +1,9 @@
 import { requestSignInCode, verifySignInCode, signOut, getSession } from "../lib/auth";
 import { fetchCareerProfile } from "../lib/career-profile";
+import { registerPostingCapture } from "../lib/capture-posting";
 import type { BackgroundRequest, BackgroundResponse } from "../lib/messages";
+
+registerPostingCapture();
 
 // The background service worker is the single owner of the Supabase
 // client/session (see src/lib/supabase.ts) — the popup and content

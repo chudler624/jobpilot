@@ -13,6 +13,7 @@ import { MatchCard } from "@/components/jobs/match-card";
 import { ResumeCard } from "@/components/jobs/resume-card";
 import { ApplicationCard } from "@/components/jobs/application-card";
 import { ReplaceDescriptionCard } from "@/components/jobs/replace-description-card";
+import { AutoExtract } from "@/components/jobs/auto-extract";
 import { createClient } from "@/lib/supabase/server";
 import {
   updateJob,
@@ -45,10 +46,13 @@ function RequirementList({
 
 export default async function JobDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ captured?: string }>;
 }) {
   const { id } = await params;
+  const { captured } = await searchParams;
   const supabase = await createClient();
   const [
     { data: job },
@@ -120,6 +124,10 @@ export default async function JobDetailPage({
 
       {job.is_snippet_only && (
         <ReplaceDescriptionCard action={replaceJobDescription.bind(null, id)} />
+      )}
+
+      {captured === "1" && !requirements && !job.is_snippet_only && (
+        <AutoExtract jobId={id} />
       )}
 
       <MatchCard

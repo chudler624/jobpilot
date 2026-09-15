@@ -40,6 +40,27 @@ magic-link sign-in). Enter the code in the popup.
 4. Review each suggested answer — click "Fill" per field you approve
 5. Submit the application yourself, the normal way
 
+## Automatic full-posting capture (Adzuna snippet-only jobs)
+
+Some Adzuna jobs only arrive as a ~500-character snippet, because Adzuna
+blocks JobPilot's server from fetching the full listing. With this
+extension loaded and signed in:
+
+1. Open a job marked snippet-only in JobPilot
+2. Click "View original listing"
+3. Leave the listing tab open for a few seconds while it loads
+
+The extension reads the posting from that tab, saves it to the job, and
+sends your JobPilot tab back to the job page, where requirements, skills
+and experience are extracted automatically. It only does this for tabs
+opened from a snippet-only JobPilot job page — nothing else is read. If
+it doesn't pick it up, the "Add the full posting" paste box on the job
+page still works. See `DECISIONS.md` ADR-020.
+
+After pulling this change, rebuild (`npm run build`) and click the reload
+icon on the extension in `chrome://extensions` — Chrome will ask you to
+accept the new permissions (read pages on all sites, see tab navigation).
+
 ## Known limitations (by design, not oversights)
 
 - Only plain `<input>`, `<textarea>`, and `<select>` elements are

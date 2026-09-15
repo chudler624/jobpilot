@@ -24,11 +24,12 @@ export function ReplaceDescriptionCard({
       <CardHeader>
         <CardTitle>Add the full posting</CardTitle>
         <CardDescription>
-          Only a short snippet of this job came through the search. Open the
-          original listing, copy the full description, and paste it here —
-          requirements, skills and experience level are re-extracted from it.
-          Any existing match score is cleared so it can be re-analyzed against
-          the full posting.
+          Only a short snippet of this job came through the search. With the
+          JobPilot browser extension signed in, just click &quot;View original
+          listing&quot; — the full posting is captured and extracted
+          automatically. Otherwise, copy the full description from the
+          listing and paste it here. Either way, any existing match score is
+          cleared so it can be re-analyzed against the full posting.
         </CardDescription>
       </CardHeader>
       <CardContent>

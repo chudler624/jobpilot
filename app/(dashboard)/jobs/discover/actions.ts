@@ -3,11 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getAIProvider } from "@/lib/ai";
-import { fetchGreenhouseJobs } from "@/lib/jobs/greenhouse";
+import { fetchGreenhouseJobs } from "@/lib/discovery/sources/greenhouse";
+import { fetchAdzunaJobs, upgradeToFullText } from "@/lib/discovery/sources/adzuna";
+import { insertDiscoveredJobs } from "@/lib/discovery/insert-jobs";
 import { jobExtractionResultSchema } from "@/lib/jobs/schemas";
 import {
   watchedCompanySchema,
   discoveryFiltersSchema,
+  adzunaSearchSchema,
   type DiscoverState,
 } from "@/lib/jobs/discovery-schemas";
 import { parseFormData, type ActionState } from "@/lib/career-profile/schemas";
@@ -58,6 +61,15 @@ export async function deleteWatchedCompany(id: string) {
   revalidatePath("/jobs/discover");
 }
 
+function summarize(added: number, duplicates: number): DiscoverState {
+  if (added === 0 && duplicates === 0) {
+    return { error: "No open jobs matched those filters." };
+  }
+  return {
+    summary: `${added} new job${added === 1 ? "" : "s"} added, ${duplicates} already tracked.`,
+  };
+}
+
 export async function fetchDiscoveredJobs(
   companyId: string,
   _prevState: DiscoverState,
@@ -94,46 +106,60 @@ export async function fetchDiscoveredJobs(
       .map((t) => t.trim())
       .filter(Boolean) ?? [];
 
-  const matching = result.jobs.filter((job) => {
-    if (role && !job.title.toLowerCase().includes(role)) return false;
-    if (location && !(job.location ?? "").toLowerCase().includes(location)) return false;
-    if (excludeTerms.some((term) => job.title.toLowerCase().includes(term))) return false;
-    return true;
-  });
+  const matching = result.jobs
+    .filter((job) => {
+      if (role && !job.title.toLowerCase().includes(role)) return false;
+      if (location && !(job.location ?? "").toLowerCase().includes(location)) return false;
+      if (excludeTerms.some((term) => job.title.toLowerCase().includes(term))) return false;
+      return true;
+    })
+    // Greenhouse's job objects have no company field of their own — the
+    // whole board is one company, so it comes from the watched-company row.
+    .map((job) => ({ ...job, company: company.name }));
 
-  let added = 0;
-  let duplicates = 0;
-
-  // Sequential, not batched — lets us catch a 23505 per row (same pattern
-  // as createApplication's unique(user_id, job_id) handling) and count
-  // duplicates individually, which a single batch insert can't do against
-  // a partial unique index.
-  for (const job of matching) {
-    const { error } = await supabase.from("jobs").insert({
-      user_id: user.id,
-      source: "greenhouse",
-      source_url: job.absoluteUrl,
-      raw_description: job.rawDescription,
-      company: company.name,
-      title: job.title,
-      location: job.location,
-    });
-
-    if (error) {
-      if (error.code === "23505") {
-        duplicates++;
-        continue;
-      }
-      return { error: error.message };
-    }
-    added++;
-  }
+  const inserted = await insertDiscoveredJobs(user.id, "greenhouse", matching);
+  if ("error" in inserted) return { error: inserted.error };
 
   revalidatePath("/jobs/discover");
-  if (added === 0 && duplicates === 0) {
-    return { error: "No open jobs matched those filters." };
+  return summarize(inserted.added, inserted.duplicates);
+}
+
+export async function searchAdzuna(
+  _prevState: DiscoverState,
+  formData: FormData
+): Promise<DiscoverState> {
+  const filters = parseFormData(adzunaSearchSchema, formData);
+  if (!filters.success) {
+    return { error: filters.error.issues[0]?.message ?? "Invalid filters" };
   }
-  return { summary: `${added} new job${added === 1 ? "" : "s"} added, ${duplicates} already tracked.` };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not signed in" };
+
+  const result = await fetchAdzunaJobs({
+    what: filters.data.what,
+    where: filters.data.where,
+    whatExclude: filters.data.whatExclude,
+    salaryMin: filters.data.salaryMin,
+    maxDaysOld: filters.data.maxDaysOld,
+  });
+  if (!result.ok) return { error: result.error };
+
+  // Full-text upgrade only for the results that survived Adzuna's own
+  // search filters — no point spending a fetch on something the search
+  // already excluded. (Adzuna's `what`/`where`/`what_exclude` already ran
+  // server-side, so no further client-side title filtering is needed here
+  // the way Greenhouse's unfiltered board listing needs it.)
+  const upgraded = await upgradeToFullText(result.jobs);
+
+  const inserted = await insertDiscoveredJobs(user.id, "adzuna", upgraded);
+  if ("error" in inserted) return { error: inserted.error };
+
+  revalidatePath("/jobs/discover");
+  return summarize(inserted.added, inserted.duplicates);
 }
 
 export async function extractJobRequirements(
@@ -179,15 +205,18 @@ export async function extractJobRequirements(
     };
   }
 
-  // title/company/location already came from Greenhouse's own listing
+  // title/company/location already came from the source's own listing
   // metadata at discovery time and are kept as-is — only backfilling
-  // fields Greenhouse's list API doesn't provide at all.
+  // fields the discovery sources don't structure themselves. Adzuna does
+  // provide salary_min/max at discovery time (job.salary_min/max, set by
+  // insertDiscoveredJobs) — only overwrite it here if extraction found
+  // something and the job didn't already have it.
   const { error: jobUpdateError } = await supabase
     .from("jobs")
     .update({
       workplace_type: validated.data.workplaceType,
-      salary_min: validated.data.salaryMin,
-      salary_max: validated.data.salaryMax,
+      salary_min: job.salary_min ?? validated.data.salaryMin,
+      salary_max: job.salary_max ?? validated.data.salaryMax,
       salary_currency: validated.data.salaryCurrency,
       updated_at: new Date().toISOString(),
     })

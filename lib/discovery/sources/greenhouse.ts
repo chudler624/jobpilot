@@ -1,19 +1,8 @@
 import * as cheerio from "cheerio";
+import type { DiscoveredJobRaw, DiscoveryResult } from "@/lib/discovery/types";
 
 const FETCH_TIMEOUT_MS = 10_000;
 const BOARD_TOKEN_PATTERN = /^[a-zA-Z0-9_-]+$/;
-
-export interface GreenhouseJob {
-  title: string;
-  location: string | null;
-  absoluteUrl: string;
-  rawDescription: string;
-  department: string | null;
-}
-
-export type FetchGreenhouseJobsResult =
-  | { ok: true; jobs: GreenhouseJob[] }
-  | { ok: false; error: string };
 
 const LOOKS_LIKE_TAGS = /<[a-z][\s\S]*>/i;
 const MAX_STRIP_PASSES = 3;
@@ -44,7 +33,7 @@ function stripHtml(html: string): string {
 // validated to a safe character set first.
 export async function fetchGreenhouseJobs(
   boardToken: string
-): Promise<FetchGreenhouseJobsResult> {
+): Promise<DiscoveryResult> {
   if (!BOARD_TOKEN_PATTERN.test(boardToken)) {
     return { ok: false, error: "Board token can only contain letters, numbers, hyphens, and underscores" };
   }
@@ -85,14 +74,14 @@ export async function fetchGreenhouseJobs(
     return { ok: false, error: "Greenhouse returned an unexpected response" };
   }
 
-  const jobs: GreenhouseJob[] = rawJobs
-    .map((raw): GreenhouseJob | null => {
+  const jobs: DiscoveredJobRaw[] = rawJobs
+    .map((raw): DiscoveredJobRaw | null => {
       const j = raw as {
+        id?: unknown;
         title?: unknown;
         absolute_url?: unknown;
         content?: unknown;
         location?: { name?: unknown };
-        departments?: { name?: unknown }[];
       };
       if (typeof j.title !== "string" || typeof j.absolute_url !== "string") {
         return null;
@@ -103,17 +92,21 @@ export async function fetchGreenhouseJobs(
 
       return {
         title: j.title,
-        absoluteUrl: j.absolute_url,
+        company: null, // filled in by the caller from the watched_companies row
+        sourceUrl: j.absolute_url,
+        // Greenhouse's list API already returns a stable numeric id per
+        // job — previously uncaptured; now shared with Adzuna's dedup key.
+        externalId:
+          typeof j.id === "number" || typeof j.id === "string" ? String(j.id) : null,
         rawDescription,
+        snippetOnly: false,
         location:
           typeof j.location?.name === "string" ? j.location.name : null,
-        department:
-          Array.isArray(j.departments) && typeof j.departments[0]?.name === "string"
-            ? (j.departments[0].name as string)
-            : null,
+        salaryMin: null,
+        salaryMax: null,
       };
     })
-    .filter((j): j is GreenhouseJob => j !== null);
+    .filter((j): j is DiscoveredJobRaw => j !== null);
 
   return { ok: true, jobs };
 }

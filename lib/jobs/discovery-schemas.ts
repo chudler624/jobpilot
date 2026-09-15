@@ -8,6 +8,16 @@ const optionalText = z
     return trimmed ? trimmed : null;
   });
 
+const optionalInt = z
+  .string()
+  .optional()
+  .transform((value) => {
+    const trimmed = value?.trim();
+    if (!trimmed) return null;
+    const parsed = Number.parseInt(trimmed, 10);
+    return Number.isNaN(parsed) ? null : parsed;
+  });
+
 export const watchedCompanySchema = z.object({
   name: z.string().trim().min(1, "Name is required"),
   board_token: z
@@ -28,6 +38,18 @@ export const discoveryFiltersSchema = z.object({
   role: optionalText,
   location: optionalText,
   exclude: optionalText,
+});
+
+// Adzuna natively supports all of these as real search parameters — a
+// materially richer pre-fetch filter set than Greenhouse's list API can
+// offer (see ADR-016). maxDaysOld isn't independently confirmed against
+// Adzuna's own docs; omitted from the request rather than assumed if unset.
+export const adzunaSearchSchema = z.object({
+  what: optionalText,
+  where: optionalText,
+  whatExclude: optionalText,
+  salaryMin: optionalInt,
+  maxDaysOld: optionalInt,
 });
 
 // Separate from the standard ActionState — a fetch's outcome is normally

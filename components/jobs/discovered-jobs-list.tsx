@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ProcessJobButton } from "@/components/jobs/process-job-button";
 import { parseMinYears } from "@/lib/match/score";
+import type { JobSource } from "@/types/supabase";
 
 export interface DiscoveredJob {
   id: string;
@@ -18,12 +19,21 @@ export interface DiscoveredJob {
   experienceRequirement: string | null;
   hasRequirements: boolean;
   overallScore: number | null;
+  source: JobSource | null;
+  sourceUrl: string | null;
+  isSnippetOnly: boolean;
 }
+
+const SOURCE_LABELS: Record<JobSource, string> = {
+  greenhouse: "Greenhouse",
+  adzuna: "Adzuna",
+};
 
 // Post-extraction filters — salary and experience aren't known until a
 // job has been through extractJobRequirements, so these only narrow
 // already-processed jobs; jobs with no salary/experience data are always
-// shown rather than hidden by an unknowable filter.
+// shown rather than hidden by an unknowable filter. Source-agnostic: the
+// same filter applies regardless of which discovery source a job came from.
 export function DiscoveredJobsList({ jobs }: { jobs: DiscoveredJob[] }) {
   const [minSalary, setMinSalary] = useState("");
   const [maxYears, setMaxYears] = useState("");
@@ -48,7 +58,7 @@ export function DiscoveredJobsList({ jobs }: { jobs: DiscoveredJob[] }) {
   if (jobs.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
-        No discovered jobs yet — fetch from a watched company above.
+        No discovered jobs yet — fetch from a watched company or search Adzuna above.
       </p>
     );
   }
@@ -80,7 +90,10 @@ export function DiscoveredJobsList({ jobs }: { jobs: DiscoveredJob[] }) {
 
       <ul className="space-y-2">
         {filtered.map((job) => (
-          <li key={job.id} className="flex flex-wrap items-center justify-between gap-3 rounded-md border p-3 text-sm">
+          <li
+            key={job.id}
+            className="flex flex-wrap items-center justify-between gap-3 rounded-md border p-3 text-sm"
+          >
             <div>
               <Link href={`/jobs/${job.id}`} className="font-medium hover:underline">
                 {job.title ?? "Untitled role"}
@@ -88,6 +101,26 @@ export function DiscoveredJobsList({ jobs }: { jobs: DiscoveredJob[] }) {
               <p className="text-muted-foreground">
                 {[job.company, job.location].filter(Boolean).join(" · ")}
               </p>
+              <div className="mt-1 flex flex-wrap items-center gap-2">
+                {job.source && (
+                  <Badge variant="outline">{SOURCE_LABELS[job.source]}</Badge>
+                )}
+                {job.isSnippetOnly && (
+                  <Badge variant="secondary" marker="unverified">
+                    Snippet only
+                  </Badge>
+                )}
+                {job.source === "adzuna" && job.sourceUrl && (
+                  <a
+                    href={job.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-primary hover:underline"
+                  >
+                    via Adzuna
+                  </a>
+                )}
+              </div>
             </div>
             {job.overallScore !== null ? (
               <Badge variant="secondary">{Math.round(job.overallScore * 100)}% match</Badge>

@@ -24,6 +24,7 @@ here), so it needs a manual pass before it can be marked done.
 - [x] Phase 5 — Truth Guard
 - [x] Phase 6 — Application Tracker
 - [x] Phase 7 — Job Discovery
+- [ ] Phase 7.5 — Job Discovery: Adzuna source (added post-Phase-8, directly addressing Phase 7 user feedback, not in the original 0-10 roadmap)
 - [ ] Phase 8 — Application Assistant
 - [ ] Phase 9 — Analytics
 - [ ] Phase 10 — Monetization
@@ -345,12 +346,12 @@ Personal CRM for the job search.
 
 ## Phase 7 — Job Discovery
 
-**Status:** DONE (not live-tested — user chose to skip verification and move
-on. User feedback, verbatim: "I think this feature is dumb and will be
-replaced." The Greenhouse-only, manually-watched-companies approach is
-considered weak/low-value as a discovery mechanism, not defective — treat
-this as a likely future revisit rather than a phase to build further on
-unprompted. See DECISIONS.md ADR-014 for what was built and why.)
+**Status:** DONE, extended by Phase 7.5 (Adzuna) below. Original Greenhouse-
+only build was not live-tested (user chose to skip verification and move
+on). User feedback, verbatim: "I think this feature is dumb and will be
+replaced." That feedback was acted on directly in Phase 7.5, not just
+noted — Adzuna is the broader discovery source the feedback was asking
+for. See DECISIONS.md ADR-014 for the original Greenhouse build and why.
 
 ### Objective
 Pull in jobs automatically instead of pasting one at a time.
@@ -384,6 +385,64 @@ Pull in jobs automatically instead of pasting one at a time.
 - [x] Duplicate jobs are not re-imported — enforced by a partial unique
       index on `(user_id, source_url)`; not live-tested (user skipped
       verification)
+- [x] Build passes — typecheck, lint, and `next build` all clean
+
+---
+
+## Phase 7.5 — Job Discovery: Adzuna source
+
+**Status:** BUILT — awaiting a real `ADZUNA_APP_ID` for a live smoke test
+(only `ADZUNA_APP_KEY` was provided). Request/response shape verified
+directly against Adzuna's own docs and against the live API with a
+placeholder app_id (confirmed reachable, confirmed the documented
+`AUTH_FAIL` error shape) — see DECISIONS.md ADR-016 for the full
+reasoning, including what could and couldn't be confirmed against
+Adzuna's docs.
+
+### Objective
+Add a real keyword-searchable discovery source alongside Greenhouse,
+directly addressing the "too narrow" feedback on Phase 7's original build.
+
+### Features
+- Adzuna kept alongside Greenhouse, not replacing it — see ADR-016 for why
+- `lib/discovery/` — shared `DiscoveredJobRaw` output type + shared
+  dedup-aware insert (`insert-jobs.ts`) behind the two source modules;
+  not a single forced interface, since the two sources' query shapes
+  genuinely differ (enumerate-a-company vs. keyword-search-globally)
+- Role/location/exclude/salary-min are real Adzuna search parameters,
+  pushed server-side — richer than Greenhouse's pre-fetch filters could
+  ever be. Recency (`max_days_old`) wired in but flagged as unconfirmed
+  against Adzuna's own docs — needs a live smoke test. Experience range
+  has no Adzuna equivalent; reuses the existing post-extraction
+  `parseMinYears` filter unchanged (already source-agnostic)
+- Adzuna search results are always a snippet, never full text (confirmed
+  from Adzuna's own docs) — full text comes from running the existing
+  SSRF-guarded `fetchJobPageText` against each result's `redirect_url`,
+  concurrently across the batch; falls back to the snippet
+  (`jobs.is_snippet_only = true`) on failure or suspiciously short text
+- Dedup unified across **both** sources on `(user_id, source, external_id)`
+  — Greenhouse's list API already had a stable per-job id, just uncaptured
+  before; the old `source_url`-based index is kept alongside the new one,
+  no backfill needed
+- Zero changes to `extractJobFields`, `analyzeMatch`, or any scoring logic
+- "via Adzuna" attribution link on Adzuna-sourced rows, per Adzuna's ToS
+
+### Database
+- `jobs.external_id` (nullable text), `jobs.is_snippet_only` (boolean)
+- `jobs.source` check constraint extended to include `'adzuna'`
+- New partial unique index `(user_id, source, external_id)`, alongside
+  (not replacing) the existing `source_url` index
+
+### Acceptance Criteria
+- [x] Adzuna search maps every UI filter to a real parameter or an
+      explicit, documented fallback (experience range) — no filter
+      silently dropped
+- [ ] A real search against Adzuna returns results, upgrades to full text
+      where possible, and lands in the unified discovered-jobs list —
+      blocked on a real `ADZUNA_APP_ID`
+- [ ] `max_days_old` behaves as expected — needs the live smoke test above
+- [x] Duplicate jobs are not re-imported across either source — enforced
+      by the new partial unique index; not live-tested pending credentials
 - [x] Build passes — typecheck, lint, and `next build` all clean
 
 ---

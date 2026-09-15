@@ -6,7 +6,7 @@
 export type EvidenceStrength = "direct" | "adjacent" | "limited" | "none";
 export type SubscriptionStatus = "free" | "pro";
 export type WorkplaceType = "remote" | "hybrid" | "onsite";
-export type JobSource = "greenhouse";
+export type JobSource = "greenhouse" | "adzuna";
 export type AtsProvider = "greenhouse";
 export type Recommendation = "apply" | "apply_stretch" | "maybe" | "skip";
 export type RequirementType = "required" | "preferred" | "technology" | "domain";
@@ -257,6 +257,8 @@ export type Database = {
           user_id: string;
           source_url: string | null;
           source: JobSource | null;
+          external_id: string | null;
+          is_snippet_only: boolean;
           raw_description: string;
           company: string | null;
           title: string | null;
@@ -273,6 +275,8 @@ export type Database = {
           user_id: string;
           source_url?: string | null;
           source?: JobSource | null;
+          external_id?: string | null;
+          is_snippet_only?: boolean;
           raw_description: string;
           company?: string | null;
           title?: string | null;
@@ -289,6 +293,8 @@ export type Database = {
           user_id?: string;
           source_url?: string | null;
           source?: JobSource | null;
+          external_id?: string | null;
+          is_snippet_only?: boolean;
           raw_description?: string;
           company?: string | null;
           title?: string | null;

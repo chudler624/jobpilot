@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 import { JobForm } from "@/components/jobs/job-form";
 import { MatchCard } from "@/components/jobs/match-card";
 import { ResumeCard } from "@/components/jobs/resume-card";
@@ -98,6 +99,17 @@ export default async function JobDetailPage({
         action={updateJob.bind(null, id)}
         deleteAction={deleteJob.bind(null, id)}
       />
+
+      {job.source_url && (
+        <a
+          href={job.source_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={buttonVariants({ variant: "outline", size: "sm" })}
+        >
+          View original listing
+        </a>
+      )}
 
       <MatchCard
         score={score ?? null}

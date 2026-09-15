@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { DiscoveredJobRaw } from "@/lib/discovery/types";
 
 const optionalText = z
   .string()
@@ -52,7 +53,8 @@ export const adzunaSearchSchema = z.object({
   maxDaysOld: optionalInt,
 });
 
-// Separate from the standard ActionState — a fetch's outcome is normally
-// informational ("5 new, 2 duplicates"), not an error, so it needs its own
-// field rather than overloading `error` for non-error messages.
-export type DiscoverState = { error?: string; summary?: string };
+// Separate from the standard ActionState — a fetch/search's outcome is a
+// list of candidates to review, not a pass/fail, so it needs its own
+// field rather than overloading `error`. Nothing is saved to `jobs` until
+// the user picks specific results via saveDiscoveredJob.
+export type DiscoverState = { error?: string; results?: DiscoveredJobRaw[] };

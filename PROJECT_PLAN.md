@@ -436,8 +436,17 @@ directly addressing the "too narrow" feedback on Phase 7's original build.
   — Greenhouse's list API already had a stable per-job id, just uncaptured
   before; the old `source_url`-based index is kept alongside the new one,
   no backfill needed
-- Zero changes to `extractJobFields`, `analyzeMatch`, or any scoring logic
 - "via Adzuna" attribution link on Adzuna-sourced rows, per Adzuna's ToS
+- **Amended after live testing (ADR-017):** discovery is review-before-save
+  for both sources — fetching/searching returns a candidate list, nothing
+  is written to `jobs` until the user clicks "Save job" on a specific
+  result. `analyzeMatch` no longer dead-ends on a job with no
+  `job_requirements` yet (a pre-existing gap, not Adzuna-specific — just
+  far more likely to surface once broad search made "click a result to
+  look at it" common) — it now extracts on demand via a shared
+  `ensureJobRequirements` helper. The job detail page now links to
+  `source_url` when present, for any source, since it was previously only
+  a text label
 
 ### Database
 - `jobs.external_id` (nullable text), `jobs.is_snippet_only` (boolean)

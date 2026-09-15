@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getAIProvider } from "@/lib/ai";
 import { fetchJobPageText } from "@/lib/jobs/fetch-job-page";
+import { ensureJobRequirements } from "@/lib/jobs/extract-requirements";
 import {
   jobIntakeSchema,
   jobExtractionResultSchema,
@@ -141,6 +142,13 @@ export async function analyzeMatch(
   } = await supabase.auth.getUser();
   if (!user) return { error: "Not signed in" };
 
+  // A job discovered via Greenhouse/Adzuna and clicked into directly
+  // (rather than through the discover page's own "Extract & score" step)
+  // won't have job_requirements yet — extract it on demand instead of
+  // dead-ending here. A no-op if requirements already exist.
+  const ensured = await ensureJobRequirements(jobId, user.id);
+  if (ensured.error) return { error: ensured.error };
+
   const [
     { data: job },
     { data: requirements },
@@ -158,7 +166,7 @@ export async function analyzeMatch(
   ]);
 
   if (!job || !requirements) {
-    return { error: "This job hasn't been analyzed yet" };
+    return { error: "Couldn't extract this job's requirements. Try again in a moment." };
   }
 
   const skillRows = skills ?? [];

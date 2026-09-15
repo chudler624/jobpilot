@@ -21,7 +21,11 @@ export function AdzunaSearchForm() {
         </div>
         <div className="space-y-1">
           <Label htmlFor="adzuna-where">Location</Label>
-          <Input id="adzuna-where" name="where" placeholder="remote, austin..." />
+          <Input id="adzuna-where" name="where" placeholder="austin, new york..." />
+          <p className="text-xs text-muted-foreground">
+            A real place name — Adzuna geocodes this, so &quot;remote&quot;
+            won&apos;t match anything. Leave blank to search everywhere.
+          </p>
         </div>
         <div className="space-y-1">
           <Label htmlFor="adzuna-exclude">Exclude</Label>

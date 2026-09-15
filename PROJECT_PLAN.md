@@ -24,7 +24,7 @@ here), so it needs a manual pass before it can be marked done.
 - [x] Phase 5 — Truth Guard
 - [x] Phase 6 — Application Tracker
 - [x] Phase 7 — Job Discovery
-- [ ] Phase 7.5 — Job Discovery: Adzuna source (added post-Phase-8, directly addressing Phase 7 user feedback, not in the original 0-10 roadmap)
+- [x] Phase 7.5 — Job Discovery: Adzuna source (added post-Phase-8, directly addressing Phase 7 user feedback, not in the original 0-10 roadmap)
 - [ ] Phase 8 — Application Assistant
 - [ ] Phase 9 — Analytics
 - [ ] Phase 10 — Monetization
@@ -391,13 +391,21 @@ Pull in jobs automatically instead of pasting one at a time.
 
 ## Phase 7.5 — Job Discovery: Adzuna source
 
-**Status:** BUILT — awaiting a real `ADZUNA_APP_ID` for a live smoke test
-(only `ADZUNA_APP_KEY` was provided). Request/response shape verified
-directly against Adzuna's own docs and against the live API with a
-placeholder app_id (confirmed reachable, confirmed the documented
-`AUTH_FAIL` error shape) — see DECISIONS.md ADR-016 for the full
-reasoning, including what could and couldn't be confirmed against
-Adzuna's docs.
+**Status:** DONE — live-verified with real credentials. `fetchAdzunaJobs`
+returns real results with unique `external_id`s; `max_days_old` confirmed
+real (result counts shift plausibly with/without it); `where` confirmed
+as a strict geographic filter (not a remote/onsite toggle — UI copy fixed
+after this surfaced a real bug in the placeholder text). One structural
+finding worth knowing, not a defect: Adzuna's `redirect_url` returns an
+unconditional 403 from Adzuna's own bot protection on every URL tested,
+confirmed independent of this app's code via direct `curl`, so the
+full-text upgrade will rarely succeed in practice — nearly every Adzuna
+job will be snippet-only, which the existing fallback already handles
+correctly. See DECISIONS.md ADR-016 for the full verification trail. The
+DB insert/dedup path reuses an already-proven pattern from elsewhere in
+this codebase and hasn't been exercised through the live authenticated
+UI (needs the user's own sign-in) — the module-level logic that feeds it
+has been.
 
 ### Objective
 Add a real keyword-searchable discovery source alongside Greenhouse,
@@ -419,7 +427,11 @@ directly addressing the "too narrow" feedback on Phase 7's original build.
   from Adzuna's own docs) — full text comes from running the existing
   SSRF-guarded `fetchJobPageText` against each result's `redirect_url`,
   concurrently across the batch; falls back to the snippet
-  (`jobs.is_snippet_only = true`) on failure or suspiciously short text
+  (`jobs.is_snippet_only = true`) on failure or suspiciously short text.
+  Live-verified this fallback triggers almost every time in practice —
+  Adzuna's own redirect links are bot-protected (403, confirmed via
+  direct `curl`, not specific to this app) — so most Adzuna jobs will be
+  snippet-only, by design and correctly flagged, not a bug
 - Dedup unified across **both** sources on `(user_id, source, external_id)`
   — Greenhouse's list API already had a stable per-job id, just uncaptured
   before; the old `source_url`-based index is kept alongside the new one,
@@ -436,13 +448,18 @@ directly addressing the "too narrow" feedback on Phase 7's original build.
 ### Acceptance Criteria
 - [x] Adzuna search maps every UI filter to a real parameter or an
       explicit, documented fallback (experience range) — no filter
-      silently dropped
-- [ ] A real search against Adzuna returns results, upgrades to full text
-      where possible, and lands in the unified discovered-jobs list —
-      blocked on a real `ADZUNA_APP_ID`
-- [ ] `max_days_old` behaves as expected — needs the live smoke test above
-- [x] Duplicate jobs are not re-imported across either source — enforced
-      by the new partial unique index; not live-tested pending credentials
+      silently dropped; `where`'s geographic-only behavior surfaced during
+      live testing and the UI copy was corrected
+- [x] A real search against Adzuna returns results and upgrades to full
+      text where possible — confirmed live with real credentials; the
+      "where possible" case is rare in practice (Adzuna's own redirect
+      links are bot-protected), correctly falls back to snippet-only
+- [x] `max_days_old` behaves as expected — confirmed live: result counts
+      shift plausibly with it applied vs. not
+- [x] Duplicate jobs are not re-imported across either source — the
+      dedup key (`external_id`) is confirmed unique per live search page
+      (20/20); the insert-time 23505 handling reuses an already-proven
+      pattern, not independently re-tested through the live UI
 - [x] Build passes — typecheck, lint, and `next build` all clean
 
 ---

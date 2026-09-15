@@ -395,17 +395,20 @@ Pull in jobs automatically instead of pasting one at a time.
 returns real results with unique `external_id`s; `max_days_old` confirmed
 real (result counts shift plausibly with/without it); `where` confirmed
 as a strict geographic filter (not a remote/onsite toggle — UI copy fixed
-after this surfaced a real bug in the placeholder text). One structural
-finding worth knowing, not a defect: Adzuna's `redirect_url` returns an
-unconditional 403 from Adzuna's own bot protection on every URL tested,
-confirmed independent of this app's code via direct `curl`, so the
-full-text upgrade will rarely succeed in practice — nearly every Adzuna
-job will be snippet-only, which the existing fallback already handles
-correctly. See DECISIONS.md ADR-016 for the full verification trail. The
-DB insert/dedup path reuses an already-proven pattern from elsewhere in
-this codebase and hasn't been exercised through the live authenticated
-UI (needs the user's own sign-in) — the module-level logic that feeds it
-has been.
+after this surfaced a real bug in the placeholder text). Live usage (18
+saved Adzuna jobs) settled the full-text-upgrade rate at roughly 1-in-4
+(`is_snippet_only = false` for 5 of 18) — Adzuna's `redirect_url` comes in
+two shapes, `adzuna.com/land/ad/...` (403, bot-blocked, confirmed via
+direct `curl`) and `adzuna.com/details/...` (fetches fine) — an initial
+5-result sample happened to draw only the blocked shape and produced an
+overly pessimistic "almost never" claim, corrected in DECISIONS.md
+ADR-018 once real usage gave a bigger sample. No code change was needed;
+the fallback was always correct, only the documented expectation was
+off. The job detail page now flags `is_snippet_only` jobs directly on
+the "Extracted requirements" card, since that — not extraction quality —
+was the real gap the user hit. DB insert/dedup reuses an already-proven
+pattern from elsewhere in this codebase and is now exercised live (18
+real saved jobs, no duplicate-key errors reported).
 
 ### Objective
 Add a real keyword-searchable discovery source alongside Greenhouse,
@@ -419,19 +422,20 @@ directly addressing the "too narrow" feedback on Phase 7's original build.
   genuinely differ (enumerate-a-company vs. keyword-search-globally)
 - Role/location/exclude/salary-min are real Adzuna search parameters,
   pushed server-side — richer than Greenhouse's pre-fetch filters could
-  ever be. Recency (`max_days_old`) wired in but flagged as unconfirmed
-  against Adzuna's own docs — needs a live smoke test. Experience range
-  has no Adzuna equivalent; reuses the existing post-extraction
-  `parseMinYears` filter unchanged (already source-agnostic)
+  ever be. Recency (`max_days_old`) live-confirmed real (result counts
+  shift plausibly with/without it). Experience range has no Adzuna
+  equivalent; reuses the existing post-extraction `parseMinYears` filter
+  unchanged (already source-agnostic)
 - Adzuna search results are always a snippet, never full text (confirmed
   from Adzuna's own docs) — full text comes from running the existing
   SSRF-guarded `fetchJobPageText` against each result's `redirect_url`,
   concurrently across the batch; falls back to the snippet
   (`jobs.is_snippet_only = true`) on failure or suspiciously short text.
-  Live-verified this fallback triggers almost every time in practice —
-  Adzuna's own redirect links are bot-protected (403, confirmed via
-  direct `curl`, not specific to this app) — so most Adzuna jobs will be
-  snippet-only, by design and correctly flagged, not a bug
+  Live usage settled the real success rate at roughly 1-in-4 (not
+  "almost never," an earlier claim corrected in ADR-018 once a bigger
+  sample came in) — some Adzuna listings redirect through a bot-blocked
+  URL shape, others through a directly-fetchable one, and the code
+  already handles both correctly by design
 - Dedup unified across **both** sources on `(user_id, source, external_id)`
   — Greenhouse's list API already had a stable per-job id, just uncaptured
   before; the old `source_url`-based index is kept alongside the new one,
@@ -460,9 +464,11 @@ directly addressing the "too narrow" feedback on Phase 7's original build.
       silently dropped; `where`'s geographic-only behavior surfaced during
       live testing and the UI copy was corrected
 - [x] A real search against Adzuna returns results and upgrades to full
-      text where possible — confirmed live with real credentials; the
-      "where possible" case is rare in practice (Adzuna's own redirect
-      links are bot-protected), correctly falls back to snippet-only
+      text where possible — confirmed live with real credentials against
+      18 real saved jobs; "where possible" holds roughly 1-in-4 of the
+      time (some Adzuna redirect links are bot-blocked, others aren't —
+      see ADR-018), correctly falls back to snippet-only the rest of the
+      time, now clearly flagged on the job's own page
 - [x] `max_days_old` behaves as expected — confirmed live: result counts
       shift plausibly with it applied vs. not
 - [x] Duplicate jobs are not re-imported across either source — the

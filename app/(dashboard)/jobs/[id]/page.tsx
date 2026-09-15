@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -133,6 +134,14 @@ export default async function JobDetailPage({
         <Card>
           <CardHeader>
             <CardTitle>Extracted requirements</CardTitle>
+            {job.is_snippet_only && (
+              <CardDescription>
+                This job&apos;s description is a short snippet, not the full
+                posting — extraction is thinner than usual as a result, not
+                a bug. Click &quot;View original listing&quot; above to read
+                the real posting.
+              </CardDescription>
+            )}
           </CardHeader>
           <CardContent className="space-y-4">
             {requirements.technologies.length > 0 && (

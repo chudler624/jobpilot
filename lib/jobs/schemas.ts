@@ -22,6 +22,14 @@ export const jobIntakeSchema = z
     path: ["rawText"],
   });
 
+export const jobDescriptionReplaceSchema = z.object({
+  rawText: z
+    .string()
+    .trim()
+    .min(200, "That's too short to be the full posting — paste the whole description.")
+    .max(50000, "That's longer than any real job posting — paste just the description."),
+});
+
 export const jobExtractionResultSchema = z.object({
   company: z.string().nullable(),
   title: z.string().nullable(),

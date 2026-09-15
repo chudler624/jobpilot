@@ -142,8 +142,35 @@ export async function searchAdzuna(
   });
   if (!result.ok) return { error: result.error };
 
-  const upgraded = await upgradeToFullText(result.jobs);
+  const excludeTerms = (filters.data.whatExclude ?? "")
+    .toLowerCase()
+    .split(/[,\s]+/)
+    .filter(Boolean);
+  const kept = result.jobs.filter((job) => !titleMatchesExclusion(job.title, excludeTerms));
+
+  const upgraded = await upgradeToFullText(kept);
   return { results: upgraded };
+}
+
+// Adzuna's what_exclude only drops exact words, so excluding "senior"
+// still returns "Sr. Software Engineer" (live-verified) — re-check titles
+// here, common abbreviations included.
+const EXCLUDE_ALIASES: Record<string, string[]> = {
+  senior: ["sr"],
+  sr: ["senior"],
+  junior: ["jr"],
+  jr: ["junior"],
+  manager: ["mgr"],
+  principal: ["prin"],
+};
+
+function titleMatchesExclusion(title: string, terms: string[]): boolean {
+  return terms
+    .flatMap((term) => [term, ...(EXCLUDE_ALIASES[term] ?? [])])
+    .some((term) => {
+      const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      return new RegExp(`\\b${escaped}\\b`, "i").test(title);
+    });
 }
 
 // Saves exactly one reviewed result. A plain function (not a

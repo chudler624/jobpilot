@@ -10,6 +10,7 @@ import {
   jobIntakeSchema,
   jobExtractionResultSchema,
   jobEditSchema,
+  jobDescriptionReplaceSchema,
 } from "@/lib/jobs/schemas";
 import { parseFormData, type ActionState } from "@/lib/career-profile/schemas";
 import {
@@ -129,6 +130,49 @@ export async function updateJob(
 
   revalidatePath("/jobs");
   redirect(`/jobs/${id}`);
+}
+
+// For discovered jobs stored as a ~500-char snippet because the full
+// listing couldn't be fetched server-side (Adzuna's bot-blocked land/ad
+// redirects, ADR-018): the user pastes the real posting and everything
+// derived from the snippet is rebuilt from it. The old score is dropped
+// rather than kept, since it was computed against the thin requirements.
+export async function replaceJobDescription(
+  jobId: string,
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const parsed = parseFormData(jobDescriptionReplaceSchema, formData);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Invalid description" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not signed in" };
+
+  const { error: updateError } = await supabase
+    .from("jobs")
+    .update({
+      raw_description: parsed.data.rawText,
+      is_snippet_only: false,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", jobId)
+    .eq("user_id", user.id);
+  if (updateError) return { error: updateError.message };
+
+  await supabase.from("job_requirements").delete().eq("job_id", jobId).eq("user_id", user.id);
+  await supabase.from("job_scores").delete().eq("job_id", jobId).eq("user_id", user.id);
+
+  const ensured = await ensureJobRequirements(jobId, user.id);
+  if (ensured.error) return { error: ensured.error };
+
+  revalidatePath(`/jobs/${jobId}`);
+  revalidatePath("/jobs/discover");
+  return {};
 }
 
 export async function analyzeMatch(

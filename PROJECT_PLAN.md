@@ -451,6 +451,13 @@ directly addressing the "too narrow" feedback on Phase 7's original build.
   `ensureJobRequirements` helper. The job detail page now links to
   `source_url` when present, for any source, since it was previously only
   a text label
+- **Amended again (ADR-019):** Adzuna's `what_exclude` only drops exact
+  words ("senior" let "Sr …" titles through, live-confirmed), so results
+  are re-filtered by title with common abbreviations. Snippet-only jobs
+  get an "Add the full posting" card on the job detail page — the user
+  pastes the real posting and requirements are re-extracted from it (old
+  score cleared). Deliberately not a smarter server-side fetch: the
+  blocked `land/ad` URLs are bot protection, not a bug to route around
 
 ### Database
 - `jobs.external_id` (nullable text), `jobs.is_snippet_only` (boolean)

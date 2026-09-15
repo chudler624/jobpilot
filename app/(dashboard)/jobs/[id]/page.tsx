@@ -12,8 +12,14 @@ import { JobForm } from "@/components/jobs/job-form";
 import { MatchCard } from "@/components/jobs/match-card";
 import { ResumeCard } from "@/components/jobs/resume-card";
 import { ApplicationCard } from "@/components/jobs/application-card";
+import { ReplaceDescriptionCard } from "@/components/jobs/replace-description-card";
 import { createClient } from "@/lib/supabase/server";
-import { updateJob, deleteJob, analyzeMatch } from "../actions";
+import {
+  updateJob,
+  deleteJob,
+  analyzeMatch,
+  replaceJobDescription,
+} from "../actions";
 import { generateResume } from "@/app/(dashboard)/resume/actions";
 import { createApplication } from "@/app/(dashboard)/applications/actions";
 
@@ -112,6 +118,10 @@ export default async function JobDetailPage({
         </a>
       )}
 
+      {job.is_snippet_only && (
+        <ReplaceDescriptionCard action={replaceJobDescription.bind(null, id)} />
+      )}
+
       <MatchCard
         score={score ?? null}
         matches={matches ?? []}
@@ -138,8 +148,8 @@ export default async function JobDetailPage({
               <CardDescription>
                 This job&apos;s description is a short snippet, not the full
                 posting — extraction is thinner than usual as a result, not
-                a bug. Click &quot;View original listing&quot; above to read
-                the real posting.
+                a bug. Paste the full posting into &quot;Add the full
+                posting&quot; above to re-extract from it.
               </CardDescription>
             )}
           </CardHeader>

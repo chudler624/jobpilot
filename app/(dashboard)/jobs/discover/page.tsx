@@ -8,6 +8,7 @@ import {
 import { AddWatchedCompanyForm } from "@/components/jobs/add-watched-company-form";
 import { FetchJobsForm } from "@/components/jobs/fetch-jobs-form";
 import { AdzunaSearchForm } from "@/components/jobs/adzuna-search-form";
+import { CsvImportForm } from "@/components/jobs/csv-import-form";
 import { DiscoveredJobsList, type DiscoveredJob } from "@/components/jobs/discovered-jobs-list";
 import { createClient } from "@/lib/supabase/server";
 import { deleteWatchedCompany } from "./actions";
@@ -84,6 +85,22 @@ export default async function DiscoverPage() {
         </CardHeader>
         <CardContent>
           <AdzunaSearchForm />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Import a CSV</CardTitle>
+          <CardDescription>
+            For a jobs list you already have (title, company, location, url
+            columns) — from your own LinkedIn search export, a spreadsheet,
+            etc. This only reads the file; it doesn&apos;t fetch or scrape
+            those URLs. Each row becomes a job you can open and capture
+            (with the browser extension) or paste a description into.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <CsvImportForm />
         </CardContent>
       </Card>
 

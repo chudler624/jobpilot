@@ -6,11 +6,13 @@ import { fetchGreenhouseJobs } from "@/lib/discovery/sources/greenhouse";
 import { fetchAdzunaJobs, upgradeToFullText } from "@/lib/discovery/sources/adzuna";
 import { insertDiscoveredJobs } from "@/lib/discovery/insert-jobs";
 import { ensureJobRequirements } from "@/lib/jobs/extract-requirements";
+import { parseJobsCsv } from "@/lib/jobs/parse-jobs-csv";
 import {
   watchedCompanySchema,
   discoveryFiltersSchema,
   adzunaSearchSchema,
   type DiscoverState,
+  type CsvImportState,
 } from "@/lib/jobs/discovery-schemas";
 import { parseFormData, type ActionState } from "@/lib/career-profile/schemas";
 import type { DiscoveredJobRaw } from "@/lib/discovery/types";
@@ -193,6 +195,70 @@ export async function saveDiscoveredJob(
 
   revalidatePath("/jobs/discover");
   return {};
+}
+
+// Bulk import of a jobs.csv the user already curated themselves outside
+// the app (e.g. exported from their own LinkedIn search). This app does
+// not fetch or scrape those URLs — no description is pulled here at all,
+// deliberately: automated requests against LinkedIn job pages are off
+// the table regardless of account or intent (ADR-009). Each row lands as
+// a snippet-only job with just its `source_url`; the existing
+// extension-capture (ADR-020) or "Add the full posting" paste box
+// (ADR-019) is how a description gets attached, same as any other
+// snippet-only job — the user still has to open each link themselves.
+const CSV_IMPORT_PLACEHOLDER =
+  "Imported from a CSV — no description yet. Open the original listing " +
+  "(with the browser extension signed in) or paste the description below.";
+
+export async function importJobsCsv(
+  _prevState: CsvImportState,
+  formData: FormData
+): Promise<CsvImportState> {
+  const file = formData.get("csvFile");
+  if (!(file instanceof File) || file.size === 0) {
+    return { error: "Choose a CSV file first." };
+  }
+
+  const text = await file.text();
+  const parsed = parseJobsCsv(text);
+  if ("error" in parsed) return { error: parsed.error };
+  if (parsed.rows.length === 0) {
+    return { error: "No usable rows found — each row needs a title and a url." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not signed in" };
+
+  let added = 0;
+  let duplicates = 0;
+
+  for (const row of parsed.rows) {
+    const { error } = await supabase.from("jobs").insert({
+      user_id: user.id,
+      source_url: row.sourceUrl,
+      raw_description: CSV_IMPORT_PLACEHOLDER,
+      is_snippet_only: true,
+      title: row.title,
+      company: row.company,
+      location: row.location,
+    });
+
+    if (error) {
+      if (error.code === "23505") {
+        duplicates++;
+        continue;
+      }
+      return { error: error.message };
+    }
+    added++;
+  }
+
+  revalidatePath("/jobs");
+  revalidatePath("/jobs/discover");
+  return { added, duplicates, skipped: parsed.skipped };
 }
 
 export async function extractJobRequirements(

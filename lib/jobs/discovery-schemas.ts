@@ -58,3 +58,12 @@ export const adzunaSearchSchema = z.object({
 // field rather than overloading `error`. Nothing is saved to `jobs` until
 // the user picks specific results via saveDiscoveredJob.
 export type DiscoverState = { error?: string; results?: DiscoveredJobRaw[] };
+
+// A CSV import is a batch, so its outcome is counts rather than a
+// pass/fail — same reasoning as DiscoverState above.
+export type CsvImportState = {
+  error?: string;
+  added?: number;
+  duplicates?: number;
+  skipped?: number;
+};

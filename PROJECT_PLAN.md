@@ -465,6 +465,13 @@ directly addressing the "too narrow" feedback on Phase 7's original build.
   Widens the extension's permissions and gives it write access to jobs
   (amends ADR-015). Not yet verified in a real browser; the paste box
   remains the fallback
+- **Amended again (ADR-021):** a request to headlessly scrape LinkedIn
+  URLs from a personal CSV export was declined — ADR-009's no-scraping
+  rule doesn't have a personal-use or which-account exception. Built a
+  CSV import instead ("Import a CSV" on the discover page): reads
+  title/company/location/url columns and creates a snippet-only job per
+  row with no fetching at all; getting a description in still goes
+  through the existing paste box or extension capture
 
 ### Database
 - `jobs.external_id` (nullable text), `jobs.is_snippet_only` (boolean)

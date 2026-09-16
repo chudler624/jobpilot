@@ -47,3 +47,6 @@ extension/dist
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# personal data — never commit a user's own job search exports
+jobs.csv

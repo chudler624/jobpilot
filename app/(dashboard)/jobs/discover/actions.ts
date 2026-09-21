@@ -216,7 +216,7 @@ function titleMatchesExclusion(title: string, terms: string[]): boolean {
 export async function saveDiscoveredJob(
   source: JobSource,
   job: DiscoveredJobRaw
-): Promise<ActionState> {
+): Promise<ActionState & { jobId?: string }> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -227,8 +227,17 @@ export async function saveDiscoveredJob(
   if ("error" in inserted) return { error: inserted.error };
   if (inserted.duplicates > 0) return { error: "Already in your tracked jobs." };
 
+  // The id lets the caller chain extract + score straight after saving.
+  const { data: saved } = await supabase
+    .from("jobs")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("source", source)
+    .eq(job.externalId ? "external_id" : "source_url", job.externalId ?? job.sourceUrl ?? "")
+    .maybeSingle();
+
   revalidatePath("/jobs/discover");
-  return {};
+  return { jobId: saved?.id };
 }
 
 // Bulk import of a jobs.csv the user already curated themselves outside

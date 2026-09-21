@@ -3,7 +3,11 @@
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { saveDiscoveredJob } from "@/app/(dashboard)/jobs/discover/actions";
+import {
+  saveDiscoveredJob,
+  extractJobRequirements,
+} from "@/app/(dashboard)/jobs/discover/actions";
+import { analyzeMatch } from "@/app/(dashboard)/jobs/actions";
 import type { DiscoveredJobRaw, SourcedJob } from "@/lib/discovery/types";
 import type { JobSource } from "@/types/supabase";
 
@@ -14,6 +18,7 @@ const ATTRIBUTION: Partial<Record<JobSource, string>> = {
 
 function ResultRow({ source, job }: { source: JobSource; job: DiscoveredJobRaw }) {
   const [saved, setSaved] = useState(false);
+  const [scored, setScored] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -53,12 +58,37 @@ function ResultRow({ source, job }: { source: JobSource; job: DiscoveredJobRaw }
             setError(null);
             startTransition(async () => {
               const result = await saveDiscoveredJob(source, job);
-              if (result.error) setError(result.error);
-              else setSaved(true);
+              if (result.error) {
+                setError(result.error);
+                return;
+              }
+              setSaved(true);
+              // A full posting can be scored right away (same two steps as
+              // the "Extract & score" button). A snippet-only job is only
+              // saved: a score from a truncated snippet would mislead.
+              if (job.snippetOnly || !result.jobId) return;
+              const extracted = await extractJobRequirements(result.jobId, {}, new FormData());
+              if (extracted.error) {
+                setError(`Saved, but scoring failed: ${extracted.error}`);
+                return;
+              }
+              const scored = await analyzeMatch(result.jobId, {}, new FormData());
+              if (scored.error) setError(`Saved, but scoring failed: ${scored.error}`);
+              else setScored(true);
             });
           }}
         >
-          {isPending ? "Saving..." : saved ? "Saved" : "Save job"}
+          {isPending
+            ? job.snippetOnly
+              ? "Saving..."
+              : "Saving & scoring..."
+            : scored
+              ? "Saved & scored"
+              : saved
+                ? "Saved"
+                : job.snippetOnly
+                  ? "Save job"
+                  : "Save & score"}
         </Button>
       </div>
     </li>

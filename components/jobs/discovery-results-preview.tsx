@@ -4,8 +4,13 @@ import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { saveDiscoveredJob } from "@/app/(dashboard)/jobs/discover/actions";
-import type { DiscoveredJobRaw } from "@/lib/discovery/types";
+import type { DiscoveredJobRaw, SourcedJob } from "@/lib/discovery/types";
 import type { JobSource } from "@/types/supabase";
+
+const ATTRIBUTION: Partial<Record<JobSource, string>> = {
+  adzuna: "via Adzuna",
+  remotive: "via Remotive",
+};
 
 function ResultRow({ source, job }: { source: JobSource; job: DiscoveredJobRaw }) {
   const [saved, setSaved] = useState(false);
@@ -32,7 +37,7 @@ function ResultRow({ source, job }: { source: JobSource; job: DiscoveredJobRaw }
               rel="noopener noreferrer"
               className="text-xs text-primary hover:underline"
             >
-              View listing
+              {ATTRIBUTION[source] ?? "View listing"}
             </a>
           )}
         </div>
@@ -68,7 +73,7 @@ export function DiscoveryResultsPreview({
   results,
 }: {
   source: JobSource;
-  results: DiscoveredJobRaw[];
+  results: (DiscoveredJobRaw | SourcedJob)[];
 }) {
   if (results.length === 0) {
     return (
@@ -85,9 +90,16 @@ export function DiscoveryResultsPreview({
         and save the ones you want to track.
       </p>
       <ul className="space-y-2">
-        {results.map((job) => (
-          <ResultRow key={job.externalId ?? job.sourceUrl ?? job.title} source={source} job={job} />
-        ))}
+        {results.map((job) => {
+          const jobSource = "source" in job ? job.source : source;
+          return (
+            <ResultRow
+              key={`${jobSource}-${job.externalId ?? job.sourceUrl ?? job.title}`}
+              source={jobSource}
+              job={job}
+            />
+          );
+        })}
       </ul>
     </div>
   );

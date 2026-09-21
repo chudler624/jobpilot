@@ -27,6 +27,7 @@ export interface DiscoveredJob {
 const SOURCE_LABELS: Record<JobSource, string> = {
   greenhouse: "Greenhouse",
   adzuna: "Adzuna",
+  remotive: "Remotive",
 };
 
 // Post-extraction filters — salary and experience aren't known until a
@@ -58,7 +59,7 @@ export function DiscoveredJobsList({ jobs }: { jobs: DiscoveredJob[] }) {
   if (jobs.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
-        No discovered jobs yet — fetch from a watched company or search Adzuna above.
+        No discovered jobs yet — search for a job title or fetch from a watched company above.
       </p>
     );
   }
@@ -110,14 +111,14 @@ export function DiscoveredJobsList({ jobs }: { jobs: DiscoveredJob[] }) {
                     Snippet only
                   </Badge>
                 )}
-                {job.source === "adzuna" && job.sourceUrl && (
+                {(job.source === "adzuna" || job.source === "remotive") && job.sourceUrl && (
                   <a
                     href={job.sourceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs text-primary hover:underline"
                   >
-                    via Adzuna
+                    via {SOURCE_LABELS[job.source]}
                   </a>
                 )}
               </div>

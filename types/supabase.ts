@@ -6,7 +6,7 @@
 export type EvidenceStrength = "direct" | "adjacent" | "limited" | "none";
 export type SubscriptionStatus = "free" | "pro";
 export type WorkplaceType = "remote" | "hybrid" | "onsite";
-export type JobSource = "greenhouse" | "adzuna";
+export type JobSource = "greenhouse" | "adzuna" | "remotive";
 export type AtsProvider = "greenhouse";
 export type Recommendation = "apply" | "apply_stretch" | "maybe" | "skip";
 export type RequirementType = "required" | "preferred" | "technology" | "domain";

@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { AddWatchedCompanyForm } from "@/components/jobs/add-watched-company-form";
 import { FetchJobsForm } from "@/components/jobs/fetch-jobs-form";
-import { AdzunaSearchForm } from "@/components/jobs/adzuna-search-form";
+import { JobSearchForm } from "@/components/jobs/job-search-form";
 import { CsvImportForm } from "@/components/jobs/csv-import-form";
 import { DiscoveredJobsList, type DiscoveredJob } from "@/components/jobs/discovered-jobs-list";
 import { createClient } from "@/lib/supabase/server";
@@ -70,21 +70,21 @@ export default async function DiscoverPage() {
       <div>
         <h1 className="text-[26px] leading-tight font-medium">Discover jobs</h1>
         <p className="mt-1 text-[15px] text-muted-foreground">
-          Search Adzuna or pull open jobs from companies you watch on
+          Search by job title, or pull open jobs from companies you watch on
           Greenhouse, instead of pasting one at a time.
         </p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Search Adzuna</CardTitle>
+          <CardTitle>Search jobs</CardTitle>
           <CardDescription>
-            Keyword search across Adzuna&apos;s aggregated listings — the
-            broadest way to find new jobs.
+            Enter a job title and search Adzuna (broad aggregator, usually a
+            snippet) and Remotive (remote roles, full posting text) at once.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <AdzunaSearchForm />
+          <JobSearchForm />
         </CardContent>
       </Card>
 
@@ -106,8 +106,9 @@ export default async function DiscoverPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Watched companies</CardTitle>
+          <CardTitle>Watched companies (Greenhouse)</CardTitle>
           <CardDescription>
+            Optional — for when you want every open job at a specific company.
             Add a company by its Greenhouse board token — the slug in their
             job board URL (e.g. &quot;gitlab&quot; for
             job-boards.greenhouse.io/gitlab).

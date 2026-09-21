@@ -1,3 +1,5 @@
+import type { JobSource } from "@/types/supabase";
+
 // Shared shape both discovery sources normalize into. Greenhouse enumerates
 // one company's board; Adzuna keyword-searches globally — genuinely
 // different query models, so the sources keep their own natural input
@@ -17,6 +19,9 @@ export interface DiscoveredJobRaw {
   salaryMin: number | null;
   salaryMax: number | null;
 }
+
+/** A result from the unified search, tagged with the source it came from. */
+export type SourcedJob = DiscoveredJobRaw & { source: JobSource };
 
 export type DiscoveryResult =
   | { ok: true; jobs: DiscoveredJobRaw[] }

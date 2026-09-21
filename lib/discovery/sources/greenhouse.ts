@@ -14,7 +14,7 @@ const MAX_STRIP_PASSES = 3;
 // structure to parse. Re-running the strip while the result still looks
 // like markup handles both single- and double-encoded content, bounded
 // so it can't loop forever on adversarial input.
-function stripHtml(html: string): string {
+export function stripHtml(html: string): string {
   let text = html;
   for (let i = 0; i < MAX_STRIP_PASSES; i++) {
     const $ = cheerio.load(text);

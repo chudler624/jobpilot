@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { DiscoveredJobRaw } from "@/lib/discovery/types";
+import type { DiscoveredJobRaw, SourcedJob } from "@/lib/discovery/types";
 
 const optionalText = z
   .string()
@@ -45,7 +45,7 @@ export const discoveryFiltersSchema = z.object({
 // materially richer pre-fetch filter set than Greenhouse's list API can
 // offer (see ADR-016). maxDaysOld isn't independently confirmed against
 // Adzuna's own docs; omitted from the request rather than assumed if unset.
-export const adzunaSearchSchema = z.object({
+export const jobSearchSchema = z.object({
   what: optionalText,
   where: optionalText,
   whatExclude: optionalText,
@@ -57,7 +57,12 @@ export const adzunaSearchSchema = z.object({
 // list of candidates to review, not a pass/fail, so it needs its own
 // field rather than overloading `error`. Nothing is saved to `jobs` until
 // the user picks specific results via saveDiscoveredJob.
-export type DiscoverState = { error?: string; results?: DiscoveredJobRaw[] };
+export type DiscoverState = {
+  error?: string;
+  results?: (DiscoveredJobRaw | SourcedJob)[];
+  /** Per-source problems from a multi-source search; other sources' results still show. */
+  warnings?: string[];
+};
 
 // A CSV import is a batch, so its outcome is counts rather than a
 // pass/fail — same reasoning as DiscoverState above.

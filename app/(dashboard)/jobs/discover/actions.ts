@@ -4,18 +4,19 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { fetchGreenhouseJobs } from "@/lib/discovery/sources/greenhouse";
 import { fetchAdzunaJobs, upgradeToFullText } from "@/lib/discovery/sources/adzuna";
+import { fetchRemotiveJobs } from "@/lib/discovery/sources/remotive";
 import { insertDiscoveredJobs } from "@/lib/discovery/insert-jobs";
 import { ensureJobRequirements } from "@/lib/jobs/extract-requirements";
 import { parseJobsCsv } from "@/lib/jobs/parse-jobs-csv";
 import {
   watchedCompanySchema,
   discoveryFiltersSchema,
-  adzunaSearchSchema,
+  jobSearchSchema,
   type DiscoverState,
   type CsvImportState,
 } from "@/lib/jobs/discovery-schemas";
 import { parseFormData, type ActionState } from "@/lib/career-profile/schemas";
-import type { DiscoveredJobRaw } from "@/lib/discovery/types";
+import type { DiscoveredJobRaw, DiscoveryResult, SourcedJob } from "@/lib/discovery/types";
 import type { JobSource } from "@/types/supabase";
 
 export async function addWatchedCompany(
@@ -120,11 +121,14 @@ export async function fetchDiscoveredJobs(
   return { results: matching };
 }
 
-export async function searchAdzuna(
+// One title search across every keyword-searchable source (Adzuna,
+// Remotive), run in parallel. A source that fails or isn't configured is
+// reported as a warning while the other sources' results still show.
+export async function searchJobs(
   _prevState: DiscoverState,
   formData: FormData
 ): Promise<DiscoverState> {
-  const filters = parseFormData(adzunaSearchSchema, formData);
+  const filters = parseFormData(jobSearchSchema, formData);
   if (!filters.success) {
     return { error: filters.error.issues[0]?.message ?? "Invalid filters" };
   }
@@ -135,23 +139,53 @@ export async function searchAdzuna(
   } = await supabase.auth.getUser();
   if (!user) return { error: "Not signed in" };
 
-  const result = await fetchAdzunaJobs({
-    what: filters.data.what,
-    where: filters.data.where,
-    whatExclude: filters.data.whatExclude,
-    salaryMin: filters.data.salaryMin,
-    maxDaysOld: filters.data.maxDaysOld,
-  });
-  if (!result.ok) return { error: result.error };
-
   const excludeTerms = (filters.data.whatExclude ?? "")
     .toLowerCase()
     .split(/[,\s]+/)
     .filter(Boolean);
-  const kept = result.jobs.filter((job) => !titleMatchesExclusion(job.title, excludeTerms));
 
-  const upgraded = await upgradeToFullText(kept);
-  return { results: upgraded };
+  const adzuna = async (): Promise<DiscoveryResult> => {
+    const result = await fetchAdzunaJobs({
+      what: filters.data.what,
+      where: filters.data.where,
+      whatExclude: filters.data.whatExclude,
+      salaryMin: filters.data.salaryMin,
+      maxDaysOld: filters.data.maxDaysOld,
+    });
+    if (!result.ok) return result;
+    const kept = result.jobs.filter((job) => !titleMatchesExclusion(job.title, excludeTerms));
+    return { ok: true, jobs: await upgradeToFullText(kept) };
+  };
+
+  // Remotive needs a keyword to search on; without one it's skipped.
+  const remotive = async (): Promise<DiscoveryResult> => {
+    if (!filters.data.what) return { ok: true, jobs: [] };
+    const result = await fetchRemotiveJobs({
+      what: filters.data.what,
+      where: filters.data.where,
+      maxDaysOld: filters.data.maxDaysOld,
+    });
+    if (!result.ok) return result;
+    return {
+      ok: true,
+      jobs: result.jobs.filter((job) => !titleMatchesExclusion(job.title, excludeTerms)),
+    };
+  };
+
+  const [adzunaResult, remotiveResult] = await Promise.all([adzuna(), remotive()]);
+
+  const results: SourcedJob[] = [];
+  const warnings: string[] = [];
+  for (const [source, label, result] of [
+    ["adzuna", "Adzuna", adzunaResult],
+    ["remotive", "Remotive", remotiveResult],
+  ] as const) {
+    if (result.ok) results.push(...result.jobs.map((job) => ({ ...job, source })));
+    else warnings.push(`${label}: ${result.error}`);
+  }
+
+  if (results.length === 0 && warnings.length > 0) return { error: warnings.join(" ") };
+  return { results, warnings };
 }
 
 // Adzuna's what_exclude only drops exact words, so excluding "senior"

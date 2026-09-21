@@ -8,7 +8,7 @@ import { DiscoveryResultsPreview } from "@/components/jobs/discovery-results-pre
 import { searchJobs } from "@/app/(dashboard)/jobs/discover/actions";
 
 // One title search across every keyword-searchable source (Adzuna and
-// Remotive). Searching never saves anything by itself — results are a
+// Jobicy). Searching never saves anything by itself — results are a
 // preview, saved one at a time below, each tagged with its source.
 export function JobSearchForm() {
   const [state, formAction, isPending] = useActionState(searchJobs, {});
@@ -26,7 +26,7 @@ export function JobSearchForm() {
             <Input id="search-where" name="where" placeholder="austin, new york..." />
             <p className="text-xs text-muted-foreground">
               A real place name — Adzuna geocodes this, so &quot;remote&quot;
-              won&apos;t match anything. Remotive lists remote roles only and
+              won&apos;t match anything. Jobicy lists remote roles only and
               keeps worldwide ones. Leave blank to search everywhere.
             </p>
           </div>
@@ -38,7 +38,7 @@ export function JobSearchForm() {
             <Label htmlFor="search-salary-min">Minimum salary</Label>
             <Input id="search-salary-min" name="salaryMin" type="number" />
             <p className="text-xs text-muted-foreground">
-              Adzuna only — Remotive&apos;s salaries are free text.
+              Applies to Adzuna only; Jobicy results aren&apos;t filtered by salary.
             </p>
           </div>
           <div className="space-y-1">

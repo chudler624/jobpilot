@@ -80,7 +80,7 @@ export default async function DiscoverPage() {
           <CardTitle>Search jobs</CardTitle>
           <CardDescription>
             Enter a job title and search Adzuna (broad aggregator, usually a
-            snippet) and Remotive (remote roles, full posting text) at once.
+            snippet) and Jobicy (remote roles, full posting text) at once.
           </CardDescription>
         </CardHeader>
         <CardContent>

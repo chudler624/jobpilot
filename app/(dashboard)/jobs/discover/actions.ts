@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { fetchGreenhouseJobs } from "@/lib/discovery/sources/greenhouse";
 import { fetchAdzunaJobs, upgradeToFullText } from "@/lib/discovery/sources/adzuna";
-import { fetchRemotiveJobs } from "@/lib/discovery/sources/remotive";
+import { fetchJobicyJobs } from "@/lib/discovery/sources/jobicy";
 import { insertDiscoveredJobs } from "@/lib/discovery/insert-jobs";
 import { ensureJobRequirements } from "@/lib/jobs/extract-requirements";
 import { parseJobsCsv } from "@/lib/jobs/parse-jobs-csv";
@@ -122,7 +122,7 @@ export async function fetchDiscoveredJobs(
 }
 
 // One title search across every keyword-searchable source (Adzuna,
-// Remotive), run in parallel. A source that fails or isn't configured is
+// Jobicy), run in parallel. A source that fails or isn't configured is
 // reported as a warning while the other sources' results still show.
 export async function searchJobs(
   _prevState: DiscoverState,
@@ -157,10 +157,10 @@ export async function searchJobs(
     return { ok: true, jobs: await upgradeToFullText(kept) };
   };
 
-  // Remotive needs a keyword to search on; without one it's skipped.
-  const remotive = async (): Promise<DiscoveryResult> => {
+  // Jobicy needs a keyword to search on; without one it's skipped.
+  const jobicy = async (): Promise<DiscoveryResult> => {
     if (!filters.data.what) return { ok: true, jobs: [] };
-    const result = await fetchRemotiveJobs({
+    const result = await fetchJobicyJobs({
       what: filters.data.what,
       where: filters.data.where,
       maxDaysOld: filters.data.maxDaysOld,
@@ -172,13 +172,13 @@ export async function searchJobs(
     };
   };
 
-  const [adzunaResult, remotiveResult] = await Promise.all([adzuna(), remotive()]);
+  const [adzunaResult, jobicyResult] = await Promise.all([adzuna(), jobicy()]);
 
   const results: SourcedJob[] = [];
   const warnings: string[] = [];
   for (const [source, label, result] of [
     ["adzuna", "Adzuna", adzunaResult],
-    ["remotive", "Remotive", remotiveResult],
+    ["jobicy", "Jobicy", jobicyResult],
   ] as const) {
     if (result.ok) results.push(...result.jobs.map((job) => ({ ...job, source })));
     else warnings.push(`${label}: ${result.error}`);

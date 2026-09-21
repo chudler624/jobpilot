@@ -27,7 +27,7 @@ export interface DiscoveredJob {
 const SOURCE_LABELS: Record<JobSource, string> = {
   greenhouse: "Greenhouse",
   adzuna: "Adzuna",
-  remotive: "Remotive",
+  jobicy: "Jobicy",
 };
 
 // Post-extraction filters — salary and experience aren't known until a
@@ -111,7 +111,7 @@ export function DiscoveredJobsList({ jobs }: { jobs: DiscoveredJob[] }) {
                     Snippet only
                   </Badge>
                 )}
-                {(job.source === "adzuna" || job.source === "remotive") && job.sourceUrl && (
+                {(job.source === "adzuna" || job.source === "jobicy") && job.sourceUrl && (
                   <a
                     href={job.sourceUrl}
                     target="_blank"

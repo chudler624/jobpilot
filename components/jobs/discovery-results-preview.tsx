@@ -9,7 +9,7 @@ import type { JobSource } from "@/types/supabase";
 
 const ATTRIBUTION: Partial<Record<JobSource, string>> = {
   adzuna: "via Adzuna",
-  remotive: "via Remotive",
+  jobicy: "via Jobicy",
 };
 
 function ResultRow({ source, job }: { source: JobSource; job: DiscoveredJobRaw }) {

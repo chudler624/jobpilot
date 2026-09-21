@@ -103,8 +103,9 @@ export async function fetchJobicyJobs(
       }
 
       return {
-        title: j.jobTitle,
-        company: typeof j.companyName === "string" ? j.companyName : null,
+        title: stripHtml(j.jobTitle),
+        // Jobicy HTML-entity-encodes these ("Zone &#038; Co"); decode them.
+        company: typeof j.companyName === "string" ? stripHtml(j.companyName) : null,
         location,
         externalId,
         sourceUrl: j.url,
